@@ -199,3 +199,42 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+/* --- Floating WhatsApp Button --- */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #25D366;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 999;
+}
+
+.whatsapp-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
+}
+
+.whatsapp-btn span {
+    font-size: 0.95rem;
+}
+
+/* Hide the text on very small phones, keep just the icon */
+@media (max-width: 500px) {
+    .whatsapp-btn span {
+        display: none;
+    }
+    .whatsapp-btn {
+        padding: 16px;
+        border-radius: 50%;
+    }
+}
