@@ -91,6 +91,20 @@
             <div class="stat-card" style="--accent: #8b5cf6;"><div class="num">{{ stats.total_products }}</div><div class="label">Products</div><div class="trend trend-neutral">{{ stats.specials_count }} specials</div></div>
         </div>
 
+        <!-- v7 MEGA FEATURES - ALL FREE -->
+        <div class="admin-section" style="background: linear-gradient(135deg, #fffbeb, white); border: 2px solid #fde68a;">
+            <h3>⚡ Quick Actions — All FREE, No Money Needed</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                <button onclick="checkLowStock()" class="btn btn-secondary" style="justify-content: center; background: #fef3c7; border-color: #fde68a; color: #92400e;">⚠️ Low Stock Check</button>
+                <button onclick="loadDailyReport()" class="btn btn-secondary" style="justify-content: center; background: #dbeafe; border-color: #bfdbfe; color: #1e40af;">📊 Daily Report</button>
+                <button onclick="loadBroadcast()" class="btn btn-secondary" style="justify-content: center; background: #dcfce7; border-color: #bbf7d0; color: #166534;">📢 Broadcast Specials</button>
+                <button onclick="loadLoyalty()" class="btn btn-secondary" style="justify-content: center; background: #f3e8ff; border-color: #e9d5ff; color: #6b21a8;">❤️ Loyalty</button>
+                <a href="/scan" class="btn btn-secondary" style="justify-content: center; background: #f1f5f9; text-decoration: none;">📷 Barcode Scanner</a>
+                <button onclick="loadQR()" class="btn btn-secondary" style="justify-content: center;">📱 QR Code for Till</button>
+            </div>
+            <div id="quickActionResult" style="margin-top: 1.25rem; display: none; background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 0.9rem; max-height: 400px; overflow-y: auto;"></div>
+        </div>
+
         <!-- ADD NEW PRODUCT - YOUR IDEA! -->
         <div class="admin-section" id="add-product" style="border: 2px solid #059669; background: linear-gradient(135deg, #f0fdf4, white);">
             <h3>➕ Add New Product — With Photo, Cost, Stock <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.2rem 0.6rem; border-radius: 9999px;">NEW</span></h3>
@@ -189,6 +203,47 @@
 </div>
 
 <script>
+// v7 QUICK ACTIONS - ALL FREE
+async function checkLowStock() {
+    const res = await fetch('/api/admin/low-stock?threshold=5');
+    const data = await res.json();
+    const el = document.getElementById('quickActionResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>⚠️ Low Stock (${data.count} items ≤ ${data.threshold}):</strong>\n\n${data.products.map(p => `• ${p.name} — Stock: ${p.stock || 0} • Cost: R${p.cost_price || 'N/A'} • Sell: R${p.price}`).join('\n')}\n\n---\nWhatsApp Alert:\n${data.whatsapp_alert}\n\n<a href="https://wa.me/27796232189?text=${encodeURIComponent(data.whatsapp_alert)}" target="_blank" class="btn btn-primary" style="margin-top: 1rem;"><span>Send WhatsApp Alert →</span></a>`;
+}
+
+async function loadDailyReport() {
+    const res = await fetch('/api/admin/daily-report');
+    const data = await res.json();
+    const el = document.getElementById('quickActionResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>📊 Daily Report — ${data.date}</strong>\n\nToday: ${data.today.orders} orders, R${data.today.revenue}\nYesterday: ${data.yesterday.orders} orders, R${data.yesterday.revenue}\nWeek: ${data.week.orders} orders, R${data.week.revenue}\n\nTop Today:\n${data.top_today.map(([name, qty]) => `• ${name}: ${qty}`).join('\n') || 'No sales today'}\n\n---\n${data.report_text}\n\n<a href="${data.whatsapp_url}" target="_blank" class="btn btn-primary" style="margin-top: 1rem;"><span>Send Report via WhatsApp →</span></a>`;
+}
+
+async function loadBroadcast() {
+    const res = await fetch('/api/admin/broadcast');
+    const data = await res.json();
+    const el = document.getElementById('quickActionResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>📢 Broadcast Specials</strong>\n\nCustomers: ${data.customers_count}\nSpecials: ${data.specials_count}\n\nMessage:\n${data.broadcast_text}\n\n<a href="${data.whatsapp_url}" target="_blank" class="btn btn-primary" style="margin-top: 1rem;"><span>Broadcast via WhatsApp →</span></a>\n\nCustomers list:\n${data.customers.map(c => `• ${c.name} — ${c.phone}`).join('\n')}`;
+}
+
+async function loadLoyalty() {
+    const res = await fetch('/api/admin/loyalty');
+    const data = await res.json();
+    const el = document.getElementById('quickActionResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>❤️ Loyalty — Top Customers</strong>\n\nTotal loyal: ${data.total_loyal} • Rewards pending: ${data.rewards_pending} (10+ orders)\n\n${data.loyal_customers.map(c => `• ${c.name} (${c.phone}) — ${c.orders} orders, R${c.spent} spent ${c.discount_eligible ? '🎉 REWARD READY!' : `(${c.next_reward} more for reward)`}`).join('\n')}`;
+}
+
+async function loadQR() {
+    const res = await fetch('/api/admin/qr');
+    const data = await res.json();
+    const el = document.getElementById('quickActionResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>📱 QR Code for Till</strong>\n\nSite: ${data.site_url}\n\n<div style="text-align: center; margin: 1rem 0;"><img src="${data.qr_api_url}" style="width: 200px; height: 200px; border-radius: 12px; border: 1px solid #e2e8f0;"></div>\n\nPrint this and put at till — customers scan to order!\n\n<a href="${data.qr_api_url}" target="_blank" class="btn btn-secondary" style="margin-top: 0.5rem;">Download QR Image</a>\n<button onclick="window.print()" class="btn btn-primary" style="margin-top: 0.5rem; margin-left: 0.5rem;"><span>🖨️ Print QR</span></button>\n\n${data.print_html}`;
+}
+
 let analyticsData = null;
 async function loadAnalytics() {
     try {
@@ -293,5 +348,5 @@ document.getElementById('refreshBtn')?.addEventListener('click', () => location.
 loadAnalytics();
 </script>
 {% endif %}
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ea14c4e80352ad',t:'MTc5MDAwNDMxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

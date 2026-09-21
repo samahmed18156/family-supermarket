@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner — Family Supermarket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        .scan-container { max-width: 600px; margin: 0 auto; padding: 6rem 1.5rem 2rem; }
+        #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 2px solid #e2e8f0; }
+        .scan-result { background: white; border-radius: 16px; padding: 1.5rem; margin-top: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: none; }
+        .scan-result.show { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Scanner</span></div></a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Shop</a>
+                <a href="/admin?key=changeme" class="nav-link">Admin</a>
+                <a href="/scan" class="nav-link active">📷 Scan</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="scan-container">
+        <h1 style="font-family: 'Space Grotesk'; font-size: 2rem; margin-bottom: 0.5rem;">📷 Barcode Scanner</h1>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">Scan product barcode to quickly find, sell, or update stock. FREE — uses phone camera.</p>
+
+        <div style="background: white; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button id="startScan" class="btn btn-primary"><span>📷 Start Scanner</span></button>
+                <button id="stopScan" class="btn btn-secondary" style="display: none;">Stop</button>
+                <input type="text" id="manualBarcode" placeholder="Or type barcode / SKU manually" style="flex: 1; min-width: 200px; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <button id="searchBarcode" class="btn btn-secondary">Search</button>
+            </div>
+        </div>
+
+        <div id="reader"></div>
+
+        <div id="scanResult" class="scan-result">
+            <h3 style="font-family: 'Space Grotesk'; margin-bottom: 1rem;">Found Product</h3>
+            <div id="resultContent"></div>
+        </div>
+
+        <div style="margin-top: 2rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 1.25rem;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">💡 How to use (FREE):</h4>
+            <ul style="font-size: 0.85rem; color: #475569; padding-left: 1.2rem; line-height: 1.6;">
+                <li>Add <code>barcode</code> field to products.json (e.g. "6001234567890")</li>
+                <li>Click Start Scanner → point camera at barcode</li>
+                <li>Auto-finds product → update stock or add to cart</li>
+                <li>Works with phone camera, no extra hardware</li>
+                <li>Uses html5-qrcode (FREE CDN)</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.75rem;">📦 All Products (with barcode):</h4>
+            <div style="display: grid; gap: 0.5rem;">
+                {% for p in products %}
+                <div style="background: white; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                    <span><strong>{{ p.name }}</strong> • {{ p.category }} • SKU: {{ p.sku or 'N/A' }}</span>
+                    <span style="font-family: monospace; background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ p.barcode or p.sku or 'No barcode' }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = {{ products|tojson }};
+        let html5QrcodeScanner = null;
+
+        document.getElementById('startScan').addEventListener('click', () => {
+            const scanner = new Html5Qrcode("reader");
+            html5QrcodeScanner = scanner;
+
+            document.getElementById('startScan').style.display = 'none';
+            document.getElementById('stopScan').style.display = 'inline-flex';
+
+            scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    console.log(`Scanned: ${decodedText}`);
+                    searchProduct(decodedText);
+                    // Optional: auto-stop after scan
+                    // scanner.stop();
+                },
+                (error) => {}
+            ).catch(err => {
+                alert('Camera error: ' + err + '. Try manual entry.');
+                document.getElementById('startScan').style.display = 'inline-flex';
+                document.getElementById('stopScan').style.display = 'none';
+            });
+        });
+
+        document.getElementById('stopScan').addEventListener('click', () => {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById('startScan').style.display = 'inline-flex';
+                    document.getElementById('stopScan').style.display = 'none';
+                    document.getElementById('reader').innerHTML = '';
+                });
+            }
+        });
+
+        function searchProduct(query) {
+            const q = query.toLowerCase();
+            const found = products.find(p =>
+                (p.barcode && p.barcode.toLowerCase() === q) ||
+                (p.sku && p.sku.toLowerCase() === q) ||
+                (p.name && p.name.toLowerCase().includes(q)) ||
+                p.id.toString() === q
+            );
+
+            const resultEl = document.getElementById('scanResult');
+            const contentEl = document.getElementById('resultContent');
+
+            if (found) {
+                resultEl.classList.add('show');
+                contentEl.innerHTML = `
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <img src="/static/images/${found.image}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 1.1rem;">${found.name}</div>
+                            <div style="font-size: 0.85rem; color: #64748b;">${found.category} • R${found.price} • Stock: ${found.stock || '∞'}</div>
+                            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                                <button onclick="updateStock(${found.id}, -1)" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">− Sell 1</button>
+                                <button onclick="updateStock(${found.id}, 1)" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">+ Stock 1</button>
+                                <a href="/?q=${found.name}" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"><span>View in Shop</span></a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                if (navigator.vibrate) navigator.vibrate(100);
+            } else {
+                resultEl.classList.add('show');
+                contentEl.innerHTML = `<p style="color: #ef4444;">❌ No product found for "${query}". Try name or add barcode to products.json</p>`;
+            }
+        }
+
+        document.getElementById('searchBarcode').addEventListener('click', () => {
+            const val = document.getElementById('manualBarcode').value.trim();
+            if (val) searchProduct(val);
+        });
+
+        document.getElementById('manualBarcode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchProduct(e.target.value.trim());
+            }
+        });
+
+        function updateStock(id, delta) {
+            alert(`Stock update: Product ${id} ${delta > 0 ? '+' : ''}${delta}\n\nTo make it permanent, update products.json or use admin edit.\n\nThis is a demo - full stock update API coming next!`);
+        }
+    </script>
+</body>
+</html>

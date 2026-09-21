@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt {{ order_id }} - Family Supermarket</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&family=Outfit:wght@400;500&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: #f8fafc; padding: 2rem; display: grid; place-items: center; min-height: 100vh; }
+        .receipt { background: white; width: 360px; max-width: 100%; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0; }
+        .receipt-header { background: #0f172a; color: white; padding: 1.5rem; text-align: center; }
+        .receipt-header h1 { font-family: 'Space Grotesk'; font-size: 1.25rem; }
+        .receipt-body { padding: 1.5rem; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem; }
+        .receipt-row.total { border-bottom: none; border-top: 2px solid #0f172a; font-weight: 700; font-size: 1.1rem; margin-top: 0.5rem; padding-top: 1rem; }
+        .receipt-footer { text-align: center; padding: 1rem 1.5rem; background: #f8fafc; font-size: 0.8rem; color: #64748b; }
+        @media print { body { background: white; padding: 0; } .receipt { box-shadow: none; border: none; } .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="receipt">
+            <div class="receipt-header">
+                <h1>Family Supermarket</h1>
+                <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.3rem;">58 5th Ave, Retreat, Cape Town</p>
+                <p style="font-size: 0.75rem; opacity: 0.6; margin-top: 0.5rem;">📞 079 623 2189</p>
+            </div>
+            <div class="receipt-body">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
+                    <span>Order: {{ order_id }}</span><span>{{ date }}</span>
+                </div>
+                <div style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>Customer:</strong> {{ customer }}</div>
+
+                {% for item in items %}
+                <div class="receipt-row">
+                    <span>{{ item.name }} x{{ item.qty }}</span>
+                    <span>R{{ "%.2f"|format(item.price * item.qty) }}</span>
+                </div>
+                {% endfor %}
+
+                <div class="receipt-row total">
+                    <span>TOTAL</span>
+                    <span>R{{ "%.2f"|format(total) }}</span>
+                </div>
+
+                <div style="margin-top: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 8px; font-size: 0.8rem; text-align: center; color: #166534;">
+                    ✅ Thank you for shopping with us!<br>Family service, wholesale prices
+                </div>
+            </div>
+            <div class="receipt-footer">
+                <p>58 5th Ave, Retreat, Cape Town, 7965</p>
+                <p style="margin-top: 0.3rem;">Scan QR to order again: {{ request.host_url }}</p>
+            </div>
+        </div>
+
+        <div class="no-print" style="text-align: center; margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center;">
+            <button onclick="window.print()" style="padding: 0.8rem 1.5rem; background: #0f172a; color: white; border: none; border-radius: 9999px; font-weight: 600; cursor: pointer;">🖨️ Print Receipt</button>
+            <a href="/" style="padding: 0.8rem 1.5rem; background: white; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 9999px; text-decoration: none; font-weight: 600;">← Back to Shop</a>
+        </div>
+    </div>
+</body>
+</html>

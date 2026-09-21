@@ -3,11 +3,22 @@ from pathlib import Path
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 from functools import lru_cache
+from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, jsonify, Response
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Upload config - FREE local storage
+UPLOAD_FOLDER = Path("static/images")
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+UPLOAD_FOLDER.mkdir(exist_ok=True)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 DB_PATH = "inquiries.db"
 PRODUCTS_FILE = Path("products.json")
@@ -337,11 +348,123 @@ def api_update_products():
     if not new_products:
         return jsonify({"success": False, "error": "No products"}), 400
 
-    # Validate
     try:
-        # Save to file
         Path("products.json").write_text(json.dumps(new_products, indent=2))
-        # Clear cache
+        load_products.cache_clear()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/products/add", methods=["POST"])
+def api_add_product():
+    """Add new product with photo upload - 100% FREE local storage"""
+    key = request.form.get("key") or request.args.get("key")
+    expected = os.getenv("ADMIN_KEY", "changeme")
+    if key != expected:
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+
+    try:
+        # Get form data
+        name = request.form.get("name", "").strip()
+        category = request.form.get("category", "General").strip()
+        price = float(request.form.get("price", 0))
+        cost_price = float(request.form.get("cost_price", 0) or 0)
+        stock = int(request.form.get("stock", 0) or 0)
+        unit = request.form.get("unit", "unit").strip()
+        description = request.form.get("description", "").strip()
+        sku = request.form.get("sku", "").strip()
+        special = request.form.get("special") == "true"
+        special_price = request.form.get("special_price")
+
+        if not name or price <= 0:
+            return jsonify({"success": False, "error": "Name and price required"}), 400
+
+        # Handle photo upload
+        image_filename = "rice.jpg"  # default
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # Make unique: product-name + timestamp
+                ext = filename.rsplit('.', 1)[1].lower()
+                base = secure_filename(name.lower().replace(' ', '-'))[:20]
+                unique_name = f"{base}-{datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                file_path = UPLOAD_FOLDER / unique_name
+                file.save(file_path)
+                image_filename = unique_name
+
+                # Optional: create WebP version for speed (FREE with Pillow)
+                try:
+                    from PIL import Image
+                    img = Image.open(file_path)
+                    img = img.convert("RGB")
+                    webp_path = UPLOAD_FOLDER / f"{Path(unique_name).stem}.webp"
+                    img.save(webp_path, "WEBP", quality=80)
+                    # Use webp if created
+                    image_filename = f"{Path(unique_name).stem}.webp"
+                except:
+                    pass  # Keep original if Pillow fails
+        elif request.form.get("image"):
+            # Use existing image name if provided
+            image_filename = request.form.get("image")
+
+        # Load existing products
+        products = load_products()
+        new_id = max([p.get('id', 0) for p in products], default=0) + 1
+
+        # Create new product with ALL fields
+        new_product = {
+            "id": new_id,
+            "name": name,
+            "category": category,
+            "price": price,
+            "cost_price": cost_price,
+            "stock": stock,
+            "unit": unit,
+            "description": description,
+            "sku": sku or f"SKU-{new_id:04d}",
+            "image": image_filename,
+            "in_stock": stock > 0,
+            "special": special,
+        }
+
+        if special and special_price:
+            try:
+                new_product["special_price"] = float(special_price)
+            except:
+                new_product["special_price"] = price * 0.9  # 10% off default
+        elif special:
+            new_product["special_price"] = round(price * 0.85, 2)
+
+        # Calculate profit margin (FREE analytics)
+        if cost_price > 0:
+            new_product["profit_margin"] = round(((price - cost_price) / price * 100), 1)
+            new_product["profit"] = round(price - cost_price, 2)
+
+        products.append(new_product)
+
+        # Save
+        Path("products.json").write_text(json.dumps(products, indent=2))
+        load_products.cache_clear()
+
+        return jsonify({"success": True, "product": new_product})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/products/delete/<int:product_id>", methods=["DELETE"])
+def api_delete_product(product_id):
+    key = request.args.get("key")
+    expected = os.getenv("ADMIN_KEY", "changeme")
+    if key != expected:
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+
+    try:
+        products = load_products()
+        products = [p for p in products if p.get('id') != product_id]
+        Path("products.json").write_text(json.dumps(products, indent=2))
         load_products.cache_clear()
         return jsonify({"success": True})
     except Exception as e:
@@ -356,6 +479,207 @@ def api_stats():
 @app.route("/api/admin/analytics")
 def api_analytics():
     return jsonify(get_analytics())
+
+
+# ===== v7 MEGA FEATURES - ALL FREE =====
+
+@app.route("/api/admin/low-stock")
+def api_low_stock():
+    """1. Low Stock Alerts - FREE"""
+    threshold = int(request.args.get("threshold", 5))
+    low_stock = []
+    for p in load_products():
+        stock = p.get("stock", 999)
+        if stock <= threshold:
+            low_stock.append(p)
+    return jsonify({
+        "threshold": threshold,
+        "count": len(low_stock),
+        "products": low_stock,
+        "whatsapp_alert": f"⚠️ LOW STOCK ALERT ({len(low_stock)} items):\n" + "\n".join(
+            [f"- {p['name']}: {p.get('stock', 0)} left" for p in low_stock[:10]])
+    })
+
+
+@app.route("/api/admin/daily-report")
+def api_daily_report():
+    """2. Daily Sales Report - FREE"""
+    from datetime import timedelta
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    # Today
+    cur.execute("SELECT COUNT(*), COALESCE(SUM(total),0) FROM orders WHERE date(created_at) = date('now')")
+    today_orders, today_revenue = cur.fetchone()
+
+    # Yesterday
+    cur.execute("SELECT COUNT(*), COALESCE(SUM(total),0) FROM orders WHERE date(created_at) = date('now', '-1 day')")
+    yest_orders, yest_revenue = cur.fetchone()
+
+    # Week
+    cur.execute("SELECT COUNT(*), COALESCE(SUM(total),0) FROM orders WHERE created_at >= date('now', '-7 days')")
+    week_orders, week_revenue = cur.fetchone()
+
+    # Top today
+    cur.execute("SELECT items FROM orders WHERE date(created_at) = date('now')")
+    product_sales = {}
+    for row in cur.fetchall():
+        try:
+            for item in json.loads(row[0]):
+                name = item.get('name')
+                product_sales[name] = product_sales.get(name, 0) + item.get('qty', 1)
+        except:
+            pass
+
+    top_today = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:3]
+
+    conn.close()
+
+    report_text = f"""📊 DAILY REPORT - {datetime.now().strftime('%Y-%m-%d')}
+
+Today: {today_orders} orders, R{today_revenue:.2f}
+Yesterday: {yest_orders} orders, R{yest_revenue:.2f}
+Week: {week_orders} orders, R{week_revenue:.2f}
+
+Top Today:
+""" + "\n".join([f"- {name}: {qty} sold" for name, qty in top_today]) + f"""
+
+Low Stock: {len([p for p in load_products() if p.get('stock', 999) <= 5])} items
+"""
+
+    return jsonify({
+        "date": datetime.now().strftime('%Y-%m-%d'),
+        "today": {"orders": today_orders, "revenue": round(today_revenue, 2)},
+        "yesterday": {"orders": yest_orders, "revenue": round(yest_revenue, 2)},
+        "week": {"orders": week_orders, "revenue": round(week_revenue, 2)},
+        "top_today": top_today,
+        "report_text": report_text,
+        "whatsapp_url": f"https://wa.me/27796232189?text={report_text}"
+    })
+
+
+@app.route("/api/admin/broadcast")
+def api_broadcast():
+    """4. WhatsApp Broadcast for Specials - FREE"""
+    specials = get_products(specials_only=True)
+    if not specials:
+        specials = load_products()[:3]
+
+    # Get unique customers from orders
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT DISTINCT customer_phone, customer_name FROM orders WHERE customer_phone != ''")
+    customers = cur.fetchall()
+    conn.close()
+
+    broadcast_text = f"🔥 WEEKLY SPECIALS - Family Supermarket!\n\n"
+    for p in specials[:5]:
+        price = p.get('special_price', p['price'])
+        broadcast_text += f"• {p['name']} - R{price} (was R{p['price']})\n"
+
+    broadcast_text += f"\n📍 58 5th Ave, Retreat\n🛒 Order: {request.host_url}\n📞 079 623 2189"
+
+    return jsonify({
+        "specials_count": len(specials),
+        "customers_count": len(customers),
+        "broadcast_text": broadcast_text,
+        "whatsapp_url": f"https://wa.me/?text={broadcast_text}",
+        "customers": [{"phone": c[0], "name": c[1]} for c in customers[:20]]
+    })
+
+
+@app.route("/api/admin/loyalty")
+def api_loyalty():
+    """Quick Win: Loyalty - FREE"""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT customer_phone, customer_name, COUNT(*) as orders, SUM(total) as spent
+        FROM orders 
+        WHERE customer_phone != ''
+        GROUP BY customer_phone
+        ORDER BY orders DESC
+        LIMIT 20
+    """)
+    loyal = cur.fetchall()
+    conn.close()
+
+    loyalty_data = []
+    for phone, name, orders, spent in loyal:
+        discount_eligible = orders >= 10
+        loyalty_data.append({
+            "phone": phone,
+            "name": name,
+            "orders": orders,
+            "spent": round(spent or 0, 2),
+            "discount_eligible": discount_eligible,
+            "next_reward": max(0, 10 - orders)
+        })
+
+    return jsonify({
+        "loyal_customers": loyalty_data,
+        "total_loyal": len(loyalty_data),
+        "rewards_pending": len([c for c in loyalty_data if c['discount_eligible']])
+    })
+
+
+@app.route("/api/admin/qr")
+def api_qr():
+    """Quick Win: QR Code - FREE"""
+    site_url = request.host_url.rstrip('/')
+    # Using free QR API (no key needed)
+    qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={site_url}"
+    return jsonify({
+        "site_url": site_url,
+        "qr_api_url": qr_api_url,
+        "print_html": f'<div style="text-align:center; padding:2rem;"><h2>Scan to Order</h2><img src="{qr_api_url}" style="width:300px;"><p>{site_url}</p><p>Family Supermarket - 58 5th Ave, Retreat</p></div>'
+    })
+
+
+@app.route("/receipt/<order_id>")
+def receipt(order_id):
+    """5. Print Receipt - FREE"""
+    # Try to find order by id or just show latest
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    try:
+        # If order_id is numeric, search by id, else show latest
+        if order_id.isdigit():
+            cur.execute("SELECT * FROM orders WHERE id = ?", (order_id,))
+        else:
+            # Try to parse FS-YYYYMMDDHHMM format - get latest
+            cur.execute("SELECT * FROM orders ORDER BY created_at DESC LIMIT 1")
+        order = cur.fetchone()
+    except:
+        order = None
+
+    conn.close()
+
+    if not order:
+        # Demo receipt
+        items = [{"name": "Rice 10kg", "qty": 1, "price": 129.99}, {"name": "Bread", "qty": 2, "price": 18.5}]
+        total = 166.99
+        customer = "Guest"
+    else:
+        try:
+            items = json.loads(order['items'])
+            total = order['total']
+            customer = order['customer_name']
+        except:
+            items = []
+            total = 0
+            customer = "Guest"
+
+    return render_template("receipt.html", order_id=order_id, items=items, total=total, customer=customer,
+                           date=datetime.now().strftime('%Y-%m-%d %H:%M'))
+
+
+@app.route("/scan")
+def scan():
+    """3. Barcode Scanner Page - FREE"""
+    return render_template("scan.html", products=load_products())
 
 
 @app.route("/sitemap.xml")
