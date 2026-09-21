@@ -195,7 +195,7 @@
                 <p style="color: #94a3b8; margin-bottom: 2.5rem;">Wholesalers welcome. Call or WhatsApp for best bulk prices.</p>
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
                     <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📍</div><div><div style="font-weight: 600;">58 5th Ave, Retreat</div><div style="font-size: 0.85rem; color: #94a3b8;">Cape Town, 7965</div></div></div>
-                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📞</div><div><div style="font-weight: 600;">079 623 2189</div><div style="font-size: 0.85rem; color: #94a3b8;">Call • WhatsApp</div></div></div>
+                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📞</div><div><div style="font-weight: 600;">{{ business_phone_display }}</div><div style="font-size: 0.85rem; color: #94a3b8;">Call • WhatsApp • {{ business_whatsapp }}</div></div></div>
                 </div>
             </div>
             <div class="contact-form-wrap">
@@ -213,7 +213,8 @@
 
     <footer><div style="max-width: 1280px; margin: 0 auto; text-align: center; padding: 2rem;">© 2024 Family Supermarket • <a href="/admin?key=changeme" style="color: #059669;">Admin Dashboard</a> • Built with Python</div></footer>
 
+    <script>window.BUSINESS_WHATSAPP = "{{ business_whatsapp }}";</script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='cart.js') }}"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ea48b1baf588d6',t:'MTc5MDAwNjQzOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

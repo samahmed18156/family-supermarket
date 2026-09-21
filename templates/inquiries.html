@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .admin-header { padding: 8rem 2rem 3rem; max-width: 900px; margin: 0 auto; }
-        .inquiry-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow-sm); border: 1px solid #e2e8f0; transition: all 0.3s; }
-        .inquiry-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .inquiry-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s; }
+        .inquiry-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -17,7 +17,7 @@
             <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Admin</span></div></a>
             <div class="nav-links">
                 <a href="/" class="nav-link">Shop</a>
-                <a href="/specials" class="nav-link">Specials</a>
+                <a href="/admin?key=changeme" class="nav-link">Admin</a>
                 <a href="/about" class="nav-link">About</a>
             </div>
         </div>
@@ -25,7 +25,7 @@
 
     <div class="admin-header">
         <h1 class="section-title" style="font-size: 2.5rem;">📬 Customer Inquiries</h1>
-        <p class="section-subtitle">{{ inquiries|length }} total • <a href="/api/products" style="color: #059669;">View API</a> • <a href="/sitemap.xml" style="color: #059669;">Sitemap</a></p>
+        <p class="section-subtitle">{{ inquiries|length }} total • Business WA: {{ business_phone_display }} ({{ business_whatsapp }}) • <a href="/api/products" style="color: #059669;">API</a></p>
     </div>
 
     <main style="max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem;">
@@ -36,16 +36,16 @@
                         <h3 style="font-family: 'Space Grotesk';">{{ inq['name'] }}</h3>
                         <span style="font-size: 0.8rem; color: #94a3b8; background: #f1f5f9; padding: 0.25rem 0.6rem; border-radius: 9999px;">{{ inq['created_at'] }}</span>
                     </div>
-                    <p style="margin-bottom: 0.5rem;"><a href="/cdn-cgi/l/email-protection#c4bfbfe4adaab59fe3a1a9a5ada8e399e4b9b9" style="color: #059669; font-weight: 500;">{{ inq['email'] }}</a> • <a href="https://wa.me/27{{ inq['email'] }}" style="color: #25D366;">WhatsApp</a></p>
+                    <p style="margin-bottom: 0.5rem;"><a href="/cdn-cgi/l/email-protection#077c7c276e69765c20626a666e6b205a277a7a" style="color: #059669; font-weight: 500;">{{ inq['email'] }}</a> • Business WA: {{ business_phone_display }}</p>
                     <div style="background: #f8fafc; padding: 1rem; border-radius: 10px; margin-top: 0.75rem; white-space: pre-wrap; line-height: 1.6;">{{ inq['message'] }}</div>
                     <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                        <a href="/cdn-cgi/l/email-protection#0d76762d64637c562a68606c64612a502d7070327e786f67686e79305f68372d5462787f2d64637c78647f742d79622d4b6c606461742d5e787d687f606c7f6668792b6f6269743045642d76762d64637c562a636c60682a502d707021" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Reply via Email</a>
-                        <a href="https://wa.me/27796232189?text=Hi%20{{ inq['name'] }}!%20Thanks%20for%20your%20message%20about%20{{ inq['message'][:30] }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><span>Reply on WhatsApp</span></a>
+                        <a href="/cdn-cgi/l/email-protection#f48f8fd49d9a85afd39199959d98d3a9d48989" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Reply via Email</a>
+                        <a href="https://wa.me/{{ business_whatsapp }}?text=Hi%20{{ inq['name'] }}!%20Thanks%20for%20your%20message%20about%20{{ inq['message'][:30] }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><span>Reply on WhatsApp</span></a>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <div style="background: white; padding: 3rem; border-radius: 24px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="background: white; padding: 3rem; border-radius: 24px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <div style="font-size: 2.5rem; margin-bottom: 1rem;">📭</div>
                 <h3>No inquiries yet</h3>
                 <p style="color: #64748b; margin-top: 0.5rem;">When customers submit the form, messages will appear here.</p>
@@ -54,5 +54,5 @@
     </main>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ea4b790e85152c',t:'MTc5MDAwNjU1Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

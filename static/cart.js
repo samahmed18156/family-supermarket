@@ -201,7 +201,9 @@ checkoutBtn?.addEventListener('click', async () => {
             text += `- ${item.name} x${item.qty} = R${(item.price * item.qty).toFixed(2)}\n`;
         });
         text += `\nTotal: R${total.toFixed(2)}\nPhone: ${phone}`;
-        window.open(`https://wa.me/27796232189?text=${encodeURIComponent(text)}`, '_blank');
+        // Uses business_whatsapp from global or fallback
+        const waNumber = window.BUSINESS_WHATSAPP || '27796232189';
+        window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     checkoutBtn.innerHTML = '<span>Checkout via WhatsApp →</span>';

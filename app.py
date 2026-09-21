@@ -20,6 +20,12 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# BUSINESS WHATSAPP - Change this to your number! FREE config
+# Format: Country code + number without 0, e.g. South Africa 079 623 2189 -> 27796232189
+# You can also set BUSINESS_WHATSAPP env var in Render
+BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27638378201")  # Default: your current
+BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "079 623 2189")  # For display
+
 DB_PATH = "inquiries.db"
 PRODUCTS_FILE = Path("products.json")
 
@@ -241,7 +247,9 @@ def inject_globals():
         "store_hours": STORE_HOURS,
         "today_name": now.strftime("%A"),
         "all_categories": sorted(set(p['category'] for p in load_products())),
-        "specials_count": len([p for p in load_products() if p.get('special')])
+        "specials_count": len([p for p in load_products() if p.get('special')]),
+        "business_whatsapp": BUSINESS_WHATSAPP,
+        "business_phone_display": BUSINESS_PHONE_DISPLAY
     }
 
 
@@ -333,7 +341,7 @@ def api_checkout():
     return jsonify({
         "success": True,
         "order_id": "FS-" + datetime.now().strftime("%Y%m%d%H%M"),
-        "whatsapp_url": f"https://wa.me/27796232189?text={wa_text}"
+        "whatsapp_url": f"https://wa.me/{BUSINESS_WHATSAPP}?text={wa_text}"
     })
 
 
@@ -642,7 +650,7 @@ Low Stock: {len([p for p in load_products() if p.get('stock', 999) <= 5])} items
         "week": {"orders": week_orders, "revenue": round(week_revenue, 2)},
         "top_today": top_today,
         "report_text": report_text,
-        "whatsapp_url": f"https://wa.me/27796232189?text={report_text}"
+        "whatsapp_url": f"https://wa.me/{BUSINESS_WHATSAPP}?text={report_text}"
     })
 
 
