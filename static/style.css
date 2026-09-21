@@ -308,3 +308,21 @@ footer {
     font-weight: 600;
     font-size: 1.05rem;
 }
+/* --- Live Open/Closed Status --- */
+.status {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-open {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.status-closed {
+    background: #fee2e2;
+    color: #b91c1c;
+}

@@ -29,7 +29,11 @@
             <div class="info-grid">
                 <p><strong>📍 Address:</strong><br>58 5th Ave, Retreat, Cape Town, 7965</p>
                 <p><strong>📞 Phone:</strong><br><a href="tel:0796232189">079 623 2189</a></p>
-                <p><strong>🕒 Hours:</strong><br>Open · Closes 6 pm</p>
+                                <p><strong>🕒 Hours:</strong><br>
+                    <span class="status {% if store_status.is_open %}status-open{% else %}status-closed{% endif %}">
+                        {% if store_status.is_open %}🟢{% else %}🔴{% endif %} {{ store_status.message }}
+                    </span>
+                </p>
                 <p><strong>⭐ Rating:</strong><br>4.3 / 5 (11 reviews)</p>
             </div>
         </div>
