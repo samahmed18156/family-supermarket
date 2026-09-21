@@ -1,0 +1,8 @@
+[
+  {"id":1,"name":"Brown Bread","category":"Bakery","price":18.5,"unit":"loaf","image":"bread.jpg","in_stock":true,"special":false},
+  {"id":2,"name":"Soft Drinks 2L","category":"Drinks","price":22,"unit":"bottle","image":"drinks.jpg","in_stock":true,"special":true,"special_price":18},
+  {"id":3,"name":"Sunflower Oil 2L","category":"Groceries","price":65,"unit":"bottle","image":"oil.jpg","in_stock":true,"special":true,"special_price":55},
+  {"id":4,"name":"Rice 10kg","category":"Staples","price":129.99,"unit":"bag","image":"rice.jpg","in_stock":true,"special":false},
+  {"id":5,"name":"Mixed Snacks Pack","category":"Snacks","price":35,"unit":"pack","image":"snacks.jpg","in_stock":true,"special":false},
+  {"id":6,"name":"Fresh Vegetables Combo","category":"Produce","price":49.99,"unit":"combo","image":"vegetables.jpg","in_stock":true,"special":true,"special_price":39.99}
+]

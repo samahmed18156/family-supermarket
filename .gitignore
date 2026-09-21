@@ -1,6 +1,11 @@
-.env
 __pycache__/
 *.pyc
-.idea/
-venv/
+*.pyo
+.env
+inquiries.db
 *.db
+.idea/
+.vscode/
+*.log
+static/images/optimized/
+.DS_Store
