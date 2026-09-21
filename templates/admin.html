@@ -18,27 +18,34 @@
         .stat-card { background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); position: relative; overflow: hidden; transition: all 0.3s; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
         .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, #059669); }
-        .stat-card .num { font-family: 'Space Grotesk'; font-size: 2.2rem; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+        .stat-card .num { font-family: 'Space Grotesk'; font-size: 2.2rem; font-weight: 700; line-height: 1; }
         .stat-card .label { font-size: 0.85rem; color: #64748b; margin-top: 0.4rem; font-weight: 500; }
         .stat-card .trend { font-size: 0.75rem; margin-top: 0.6rem; padding: 0.2rem 0.5rem; border-radius: 9999px; display: inline-block; font-weight: 600; }
         .trend-up { background: #dcfce7; color: #166534; }
         .trend-neutral { background: #f1f5f9; color: #64748b; }
         .admin-section { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-        .admin-section h3 { font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; }
+        .admin-section h3 { font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
         .chart-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
         .chart-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .product-edit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-        .edit-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; background: #f8fafc; transition: all 0.2s; }
+        .edit-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; background: #f8fafc; transition: all 0.2s; position: relative; }
         .edit-card:hover { border-color: #059669; background: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .edit-card input, .edit-card select { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #e2e8f0; border-radius: 10px; margin-top: 0.3rem; font-size: 0.9rem; transition: all 0.2s; }
-        .edit-card input:focus { border-color: #059669; outline: none; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
-        .edit-card label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.06em; }
+        .edit-card input, .edit-card select, .add-form input, .add-form select, .add-form textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #e2e8f0; border-radius: 10px; margin-top: 0.3rem; font-size: 0.9rem; transition: all 0.2s; font-family: inherit; }
+        .edit-card input:focus, .add-form input:focus, .add-form select:focus, .add-form textarea:focus { border-color: #059669; outline: none; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .edit-card label, .add-form label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.06em; }
+        .add-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .add-form .full { grid-column: 1 / -1; }
+        .photo-upload { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 1.5rem; text-align: center; background: #f8fafc; transition: all 0.2s; cursor: pointer; }
+        .photo-upload:hover { border-color: #059669; background: #f0fdf4; }
+        .photo-upload.dragover { border-color: #059669; background: #dcfce7; transform: scale(1.01); }
         .order-card, .inq-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 1.1rem; margin-bottom: 0.75rem; background: white; display: flex; justify-content: space-between; gap: 1rem; transition: all 0.2s; }
         .order-card:hover, .inq-card:hover { border-color: #cbd5e1; transform: translateX(2px); }
-        .badge { padding: 0.25rem 0.7rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; }
+        .badge { padding: 0.25rem 0.7rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-special { background: #dcfce7; color: #166534; }
-        @media (max-width: 1100px) { .chart-grid { grid-template-columns: 1fr; } }
+        .badge-stock-low { background: #fee2e2; color: #991b1b; }
+        .badge-stock-ok { background: #dcfce7; color: #166534; }
+        @media (max-width: 1100px) { .chart-grid { grid-template-columns: 1fr; } .add-form { grid-template-columns: 1fr; } }
         @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } .admin-sidebar { height: auto; position: relative; } }
     </style>
 </head>
@@ -46,279 +53,243 @@
 {% if not is_authorized %}
 <div style="min-height: 100vh; display: grid; place-items: center; background: radial-gradient(800px circle at 20% -10%, rgba(16,185,129,0.15), transparent), #f8fafc; padding: 2rem;">
     <div style="background: white; padding: 2.75rem; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); max-width: 420px; width: 100%; text-align: center; border: 1px solid #e2e8f0;">
-        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border-radius: 16px; display: grid; place-items: center; margin: 0 auto 1.5rem; font-weight: 700; font-family: 'Space Grotesk'; font-size: 1.75rem; box-shadow: 0 8px 24px rgba(15,23,42,0.2);">F</div>
-        <h2 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem; letter-spacing: -0.02em;">Admin Access</h2>
-        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.75rem; line-height: 1.5;">Secure dashboard for Family Supermarket. Enter your admin key.</p>
+        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border-radius: 16px; display: grid; place-items: center; margin: 0 auto 1.5rem; font-weight: 700; font-family: 'Space Grotesk'; font-size: 1.75rem;">F</div>
+        <h2 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem;">Admin Access</h2>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.75rem;">Enter admin key to manage products, orders, stock.</p>
         <form method="GET" style="display: flex; gap: 0.6rem;">
-            <input type="password" name="key" placeholder="Admin key" style="flex: 1; padding: 0.9rem 1.1rem; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem;" required>
+            <input type="password" name="key" placeholder="Admin key" style="flex: 1; padding: 0.9rem 1.1rem; border: 1px solid #e2e8f0; border-radius: 12px;" required>
             <button type="submit" class="btn btn-primary"><span>Unlock →</span></button>
         </form>
-        <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 1.25rem;">Demo: <code style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600;">changeme</code> • Set ADMIN_KEY in .env for production</p>
+        <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 1.25rem;">Demo: <code style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600;">changeme</code></p>
     </div>
 </div>
 {% else %}
 <div class="admin-layout">
     <aside class="admin-sidebar">
-        <h2><span style="width: 36px; height: 36px; background: linear-gradient(135deg, #059669, #10b981); border-radius: 10px; display: grid; place-items: center; font-size: 1.1rem;">F</span> Family Admin</h2>
+        <h2><span style="width: 36px; height: 36px; background: linear-gradient(135deg, #059669, #10b981); border-radius: 10px; display: grid; place-items: center;">F</span> Family Admin</h2>
         <nav class="admin-nav">
             <a href="#overview" class="active">📊 Overview</a>
+            <a href="#add-product" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.2);">➕ Add Product</a>
             <a href="#analytics">📈 Analytics</a>
             <a href="#orders">🛒 Orders ({{ stats.total_orders }})</a>
-            <a href="#inquiries">💬 Inquiries ({{ stats.total_inquiries }})</a>
+            <a href="#inquiries">💬 Inquiries</a>
             <a href="#products">📦 Products ({{ stats.total_products }})</a>
             <a href="/" style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">← Back to Shop</a>
         </nav>
-        <div style="margin-top: auto; padding-top: 2rem;">
-            <div style="background: rgba(255,255,255,0.06); border-radius: 12px; padding: 1rem; border: 1px solid rgba(255,255,255,0.08);">
-                <div style="font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;"><span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span>{{ store_status.message }}</div>
-                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem;">{{ today_name }} • {{ store_hours[today_name] }}</div>
-            </div>
-        </div>
     </aside>
 
     <main class="admin-main">
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h1 style="font-family: 'Space Grotesk'; font-size: 2.25rem; line-height: 0.9; letter-spacing: -0.03em;">Dashboard</h1>
-                <p style="color: #64748b; margin-top: 0.6rem;">Welcome back! Here's what's happening at your store.</p>
-            </div>
-            <div style="display: flex; gap: 0.6rem;">
-                <button id="refreshBtn" class="btn btn-secondary" style="padding: 0.7rem 1.1rem;">↻ Refresh</button>
-                <a href="https://wa.me/27796232189" target="_blank" class="btn btn-primary" style="padding: 0.7rem 1.1rem;"><span>WhatsApp</span></a>
-            </div>
+            <div><h1 style="font-family: 'Space Grotesk'; font-size: 2.25rem; line-height: 0.9;">Dashboard</h1><p style="color: #64748b; margin-top: 0.6rem;">Manage stock, cost, photos — 100% FREE local storage.</p></div>
+            <div style="display: flex; gap: 0.6rem;"><button id="refreshBtn" class="btn btn-secondary">↻ Refresh</button><a href="https://wa.me/27796232189" target="_blank" class="btn btn-primary"><span>WhatsApp</span></a></div>
         </div>
 
         <div class="stats-grid" id="overview">
-            <div class="stat-card" style="--accent: #059669;"><div class="num">{{ stats.total_orders }}</div><div class="label">Total Orders</div><div class="trend trend-up">↗ Live from cart checkout</div></div>
-            <div class="stat-card" style="--accent: #0ea5e9;"><div class="num">R{{ stats.total_revenue }}</div><div class="label">Total Revenue</div><div class="trend trend-neutral" id="avgOrder">Avg: R0 • Calculating...</div></div>
+            <div class="stat-card" style="--accent: #059669;"><div class="num">{{ stats.total_orders }}</div><div class="label">Total Orders</div><div class="trend trend-up">Live from cart</div></div>
+            <div class="stat-card" style="--accent: #0ea5e9;"><div class="num">R{{ stats.total_revenue }}</div><div class="label">Revenue</div><div class="trend trend-neutral" id="avgOrder">Calculating...</div></div>
             <div class="stat-card" style="--accent: #f59e0b;"><div class="num">{{ stats.total_inquiries }}</div><div class="label">Inquiries</div><div class="trend trend-up">{{ stats.today_inquiries }} today</div></div>
-            <div class="stat-card" style="--accent: #8b5cf6;"><div class="num">{{ stats.total_products }}</div><div class="label">Products</div><div class="trend trend-neutral">{{ stats.specials_count }} on special 🔥</div></div>
+            <div class="stat-card" style="--accent: #8b5cf6;"><div class="num">{{ stats.total_products }}</div><div class="label">Products</div><div class="trend trend-neutral">{{ stats.specials_count }} specials</div></div>
         </div>
 
-        <!-- ANALYTICS CHARTS -->
-        <div id="analytics">
-            <div class="chart-grid">
-                <div class="chart-card">
-                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; margin-bottom: 1rem;">📈 Revenue & Orders (Last 14 Days)</h3>
-                    <canvas id="revenueChart" height="200"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; margin-bottom: 1rem;">🏷️ Products by Category</h3>
-                    <canvas id="categoryChart" height="200"></canvas>
-                </div>
-            </div>
+        <!-- ADD NEW PRODUCT - YOUR IDEA! -->
+        <div class="admin-section" id="add-product" style="border: 2px solid #059669; background: linear-gradient(135deg, #f0fdf4, white);">
+            <h3>➕ Add New Product — With Photo, Cost, Stock <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.2rem 0.6rem; border-radius: 9999px;">NEW</span></h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">Add product with photo upload, cost price, stock on hand, profit auto-calculated. 100% FREE local storage.</p>
 
-            <div class="chart-grid">
-                <div class="chart-card">
-                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; margin-bottom: 1rem;">💬 Inquiries vs Orders</h3>
-                    <canvas id="inquiriesChart" height="200"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; margin-bottom: 1rem;">🔥 Top Selling Products</h3>
-                    <div id="topProducts" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <p style="color: #94a3b8; text-align: center; padding: 2rem;">Loading top products...</p>
+            <form id="addProductForm" enctype="multipart/form-data" class="add-form">
+                <input type="hidden" name="key" value="{{ request.args.get('key','changeme') }}">
+
+                <div class="full">
+                    <div class="photo-upload" id="photoDrop">
+                        <input type="file" name="photo" id="photoInput" accept="image/*" style="display: none;">
+                        <div id="photoPreview" style="display: none; margin-bottom: 1rem;">
+                            <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #64748b;" id="previewName"></div>
+                        </div>
+                        <div id="uploadPrompt">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
+                            <div style="font-weight: 600;">Click to upload photo or drag & drop</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.3rem;">JPG, PNG, WebP — Max 5MB — Stored FREE locally in static/images/</div>
+                        </div>
                     </div>
                 </div>
+
+                <div><label>Product Name *</label><input type="text" name="name" placeholder="e.g. Fresh Milk 2L" required></div>
+                <div><label>Category *</label><select name="category" required><option value="">Select...</option><option>Bakery</option><option>Drinks</option><option>Groceries</option><option>Staples</option><option>Snacks</option><option>Produce</option><option>Dairy</option><option>Meat</option><option>Cleaning</option><option>Other</option></select></div>
+
+                <div><label>Selling Price (R) *</label><input type="number" step="0.01" name="price" placeholder="e.g. 32.00" required></div>
+                <div><label>Cost Price (R) — For Profit</label><input type="number" step="0.01" name="cost_price" placeholder="e.g. 22.50 — what you paid"></div>
+
+                <div><label>Stock On Hand *</label><input type="number" name="stock" placeholder="e.g. 50" value="10" required></div>
+                <div><label>Unit</label><select name="unit"><option value="unit">unit</option><option value="loaf">loaf</option><option value="bottle">bottle</option><option value="bag">bag</option><option value="pack">pack</option><option value="kg">kg</option><option value="litre">litre</option><option value="combo">combo</option><option value="tray">tray</option><option value="box">box</option></select></div>
+
+                <div><label>SKU (optional)</label><input type="text" name="sku" placeholder="Auto: SKU-0007"></div>
+                <div><label>Special Offer?</label><select name="special"><option value="false">No</option><option value="true">Yes 🔥 — On Special</option></select></div>
+
+                <div class="full" id="specialPriceWrap" style="display: none;"><label>Special Price (R)</label><input type="number" step="0.01" name="special_price" placeholder="e.g. 27.00 — sale price"></div>
+
+                <div class="full"><label>Description</label><textarea name="description" rows="2" placeholder="e.g. Fresh full cream milk, 2L bottle, expires in 5 days"></textarea></div>
+
+                <div class="full" style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.9rem 1.8rem;"><span>➕ Add Product — FREE</span></button>
+                    <span id="addStatus" style="font-size: 0.9rem; color: #64748b;"></span>
+                </div>
+            </form>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 12px; border: 1px dashed #cbd5e1; font-size: 0.8rem; color: #64748b;">
+                <strong>💡 How it works (FREE):</strong> Photo saved to <code>static/images/</code> on your server (Render free storage). No Cloudinary, no S3 fees. Cost price + stock used to calculate profit margin. Stock 0 = shows "Out of Stock".
+            </div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div id="analytics">
+            <div class="chart-grid">
+                <div class="chart-card"><h3>📈 Revenue & Orders (14 Days)</h3><canvas id="revenueChart" height="200"></canvas></div>
+                <div class="chart-card"><h3>🏷️ By Category</h3><canvas id="categoryChart" height="200"></canvas></div>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-card"><h3>💬 Inquiries vs Orders</h3><canvas id="inquiriesChart" height="200"></canvas></div>
+                <div class="chart-card"><h3>🔥 Top Selling</h3><div id="topProducts"><p style="color: #94a3b8; text-align: center; padding: 2rem;">Loading...</p></div></div>
             </div>
         </div>
 
         <div class="admin-section" id="orders">
-            <h3>🛒 Recent Orders <span style="font-size: 0.8rem; background: #f1f5f9; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600;">{{ stats.total_orders }} total</span></h3>
-            {% if orders %}
-                {% for order in orders[:15] %}
-                <div class="order-card">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">{{ order['customer_name'] or 'Guest' }} • R{{ order['total'] }} <span class="badge badge-pending">{{ order['status'] }}</span></div>
-                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">{{ order['created_at'] }} • {{ order['customer_phone'] }}</div>
-                        <div style="font-size: 0.8rem; background: #f8fafc; padding: 0.6rem 0.8rem; border-radius: 10px; margin-top: 0.6rem; max-width: 600px; white-space: pre-wrap; border: 1px solid #f1f5f9;">{{ order['items'][:300] }}{% if order['items']|length > 300 %}...{% endif %}</div>
-                    </div>
-                    <a href="https://wa.me/{{ order['customer_phone']|replace(' ', '')|replace('+', '') }}?text=Hi%20{{ order['customer_name'] }}!%20Your%20order%20is%20confirmed" target="_blank" class="btn btn-primary" style="padding: 0.5rem 0.9rem; font-size: 0.8rem; height: fit-content;"><span>WA</span></a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div style="text-align: center; padding: 3rem 1rem; color: #94a3b8;"><div style="font-size: 2.5rem; margin-bottom: 1rem;">🛒</div><p>No orders yet. When customers checkout via cart, orders appear here.</p><p style="font-size: 0.85rem; margin-top: 0.5rem;">Try adding items to cart on the shop page!</p></div>
-            {% endif %}
+            <h3>🛒 Recent Orders</h3>
+            {% if orders %}{% for order in orders[:10] %}<div class="order-card"><div style="flex: 1;"><div style="font-weight: 600;">{{ order['customer_name'] or 'Guest' }} • R{{ order['total'] }} <span class="badge badge-pending">{{ order['status'] }}</span></div><div style="font-size: 0.8rem; color: #64748b;">{{ order['created_at'] }}</div><div style="font-size: 0.8rem; background: #f8fafc; padding: 0.5rem; border-radius: 8px; margin-top: 0.5rem;">{{ order['items'][:200] }}...</div></div></div>{% endfor %}{% else %}<p style="color: #94a3b8; text-align: center; padding: 2rem;">No orders yet.</p>{% endif %}
         </div>
 
         <div class="admin-section" id="products">
-            <h3>📦 Edit Products (Live) <span style="font-size: 0.75rem; background: #dcfce7; color: #166534; padding: 0.2rem 0.6rem; border-radius: 9999px;">Python-powered</span></h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Edit prices, toggle specials. Click Save to update <code>products.json</code> instantly. No code needed!</p>
+            <h3>📦 Edit Products <span style="font-size: 0.75rem; background: #dcfce7; color: #166534; padding: 0.2rem 0.6rem; border-radius: 9999px;">Live Edit + Delete</span></h3>
             <div class="product-edit-grid" id="productEditor">
                 {% for p in products %}
                 <div class="edit-card" data-id="{{ p.id }}">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-                        <strong style="font-size: 0.95rem; font-family: 'Space Grotesk';">{{ p.name }}</strong>
-                        <span class="badge {% if p.special %}badge-special{% endif %}">{{ p.category }}</span>
+                    <img src="{{ url_for('static', filename='images/' + p.image) }}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 10px; margin-bottom: 0.75rem;" onerror="this.style.display='none'">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong style="font-size: 0.9rem; font-family: 'Space Grotesk';">{{ p.name }}</strong>
+                        <span class="badge {% if p.stock is defined and p.stock == 0 %}badge-stock-low{% elif p.special %}badge-special{% else %}badge-stock-ok{% endif %}">{% if p.stock is defined and p.stock == 0 %}OUT{% else %}{{ p.category }}{% endif %}</span>
                     </div>
-                    <label>Price (R)</label>
-                    <input type="number" step="0.01" value="{{ p.price }}" class="edit-price">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem;">
-                        <div><label>Special?</label><select class="edit-special"><option value="true" {% if p.special %}selected{% endif %}>Yes 🔥</option><option value="false" {% if not p.special %}selected{% endif %}>No</option></select></div>
+                    {% if p.cost_price is defined %}<div style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem;">Cost: R{{ p.cost_price }} • Stock: {{ p.stock or '∞' }} {% if p.profit_margin is defined %}• <span style="color: #059669; font-weight: 600;">{{ p.profit_margin }}% profit</span>{% endif %}</div>{% endif %}
+                    <label>Price (R)</label><input type="number" step="0.01" value="{{ p.price }}" class="edit-price">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                        <div><label>Special?</label><select class="edit-special"><option value="true" {% if p.special %}selected{% endif %}>Yes</option><option value="false" {% if not p.special %}selected{% endif %}>No</option></select></div>
                         <div><label>Special Price</label><input type="number" step="0.01" value="{{ p.special_price or p.price }}" class="edit-special-price"></div>
                     </div>
-                    <label style="margin-top: 0.6rem; display: block;">Image file</label>
-                    <input type="text" value="{{ p.image }}" class="edit-image" style="font-size: 0.8rem; font-family: monospace;">
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                        <button class="btn btn-secondary save-one" data-id="{{ p.id }}" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;">Save</button>
+                        <button class="btn delete-one" data-id="{{ p.id }}" style="flex: 1; padding: 0.5rem; font-size: 0.8rem; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">Delete</button>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem;">
-                <button id="saveProducts" class="btn btn-primary"><span>💾 Save All Products</span></button>
-                <span id="saveStatus" style="font-size: 0.9rem; color: #64748b;"></span>
-            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button id="saveProducts" class="btn btn-primary"><span>💾 Save All</span></button><span id="saveStatus" style="font-size: 0.9rem; color: #64748b;"></span></div>
         </div>
 
-        <div class="admin-section" id="inquiries">
-            <h3>💬 Customer Inquiries ({{ inquiries|length }})</h3>
-            {% for inq in inquiries[:20] %}
-            <div class="inq-card">
-                <div style="flex: 1;">
-                    <div style="font-weight: 600;">{{ inq['name'] }} • <a href="mailto:{{ inq['email'] }}" style="color: #059669; text-decoration: none;">{{ inq['email'] }}</a></div>
-                    <div style="font-size: 0.8rem; color: #94a3b8;">{{ inq['created_at'] }}</div>
-                    <div style="margin-top: 0.6rem; font-size: 0.9rem; background: #f8fafc; padding: 0.85rem; border-radius: 12px; border: 1px solid #f1f5f9;">{{ inq['message'] }}</div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                    <a href="mailto:{{ inq['email'] }}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;">Email</a>
-                    <a href="https://wa.me/27796232189?text=Hi%20{{ inq['name'] }}" target="_blank" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;"><span>WA</span></a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <div class="admin-section" id="inquiries"><h3>💬 Inquiries ({{ inquiries|length }})</h3>{% for inq in inquiries[:15] %}<div class="inq-card"><div style="flex: 1;"><div style="font-weight: 600;">{{ inq['name'] }} • {{ inq['email'] }}</div><div style="font-size: 0.8rem; color: #94a3b8;">{{ inq['created_at'] }}</div><div style="margin-top: 0.5rem; font-size: 0.9rem; background: #f8fafc; padding: 0.75rem; border-radius: 10px;">{{ inq['message'] }}</div></div></div>{% endfor %}</div>
     </main>
 </div>
 
 <script>
 let analyticsData = null;
-
 async function loadAnalytics() {
     try {
         const res = await fetch('/api/admin/analytics');
         analyticsData = await res.json();
-
-        // Update avg order
         document.getElementById('avgOrder').textContent = `Avg: R${analyticsData.avg_order_value} • ${analyticsData.total_orders} orders`;
-
-        // Revenue Chart
-        const revCtx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(revCtx, {
-            type: 'line',
-            data: {
-                labels: analyticsData.days,
-                datasets: [
-                    { label: 'Revenue (R)', data: analyticsData.revenue_per_day, borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.1)', tension: 0.4, fill: true, borderWidth: 2.5 },
-                    { label: 'Orders', data: analyticsData.orders_per_day, borderColor: '#0ea5e9', backgroundColor: 'rgba(14,165,233,0.1)', tension: 0.4, fill: false, borderWidth: 2, yAxisID: 'y1' }
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                plugins: { legend: { display: true, position: 'bottom' } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                    y1: { beginAtZero: true, position: 'right', grid: { display: false } },
-                    x: { grid: { display: false } }
-                },
-                animation: { duration: 1200, easing: 'easeOutQuart' }
-            }
-        });
-
-        // Category Chart
-        const catCtx = document.getElementById('categoryChart').getContext('2d');
-        const catLabels = Object.keys(analyticsData.category_breakdown);
-        const catData = Object.values(analyticsData.category_breakdown);
-        new Chart(catCtx, {
-            type: 'doughnut',
-            data: {
-                labels: catLabels,
-                datasets: [{ data: catData, backgroundColor: ['#059669','#0ea5e9','#f59e0b','#8b5cf6','#ef4444','#10b981'], borderWidth: 0 }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } },
-                animation: { animateRotate: true, duration: 1500 },
-                cutout: '65%'
-            }
-        });
-
-        // Inquiries vs Orders
-        const inqCtx = document.getElementById('inquiriesChart').getContext('2d');
-        new Chart(inqCtx, {
-            type: 'bar',
-            data: {
-                labels: analyticsData.days,
-                datasets: [
-                    { label: 'Inquiries', data: analyticsData.inquiries_per_day, backgroundColor: '#f59e0b', borderRadius: 6 },
-                    { label: 'Orders', data: analyticsData.orders_per_day, backgroundColor: '#059669', borderRadius: 6 }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } },
-                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } },
-                animation: { duration: 1000 }
-            }
-        });
-
-        // Top products
+        const revCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revCtx) new Chart(revCtx, { type: 'line', data: { labels: analyticsData.days, datasets: [{ label: 'Revenue (R)', data: analyticsData.revenue_per_day, borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.1)', tension: 0.4, fill: true, borderWidth: 2.5 }, { label: 'Orders', data: analyticsData.orders_per_day, borderColor: '#0ea5e9', backgroundColor: 'rgba(14,165,233,0.1)', tension: 0.4, fill: false, borderWidth: 2, yAxisID: 'y1' }] }, options: { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: true, position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, y1: { beginAtZero: true, position: 'right', grid: { display: false } }, x: { grid: { display: false } } }, animation: { duration: 1200 } } });
+        const catCtx = document.getElementById('categoryChart')?.getContext('2d');
+        if (catCtx) new Chart(catCtx, { type: 'doughnut', data: { labels: Object.keys(analyticsData.category_breakdown), datasets: [{ data: Object.values(analyticsData.category_breakdown), backgroundColor: ['#059669','#0ea5e9','#f59e0b','#8b5cf6','#ef4444','#10b981'], borderWidth: 0 }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } }, animation: { duration: 1500 }, cutout: '65%' } });
+        const inqCtx = document.getElementById('inquiriesChart')?.getContext('2d');
+        if (inqCtx) new Chart(inqCtx, { type: 'bar', data: { labels: analyticsData.days, datasets: [{ label: 'Inquiries', data: analyticsData.inquiries_per_day, backgroundColor: '#f59e0b', borderRadius: 6 }, { label: 'Orders', data: analyticsData.orders_per_day, backgroundColor: '#059669', borderRadius: 6 }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } } });
         const topEl = document.getElementById('topProducts');
-        if (analyticsData.top_products.length === 0) {
-            topEl.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 1.5rem;">No sales yet. Top products will appear after checkouts.</p>';
-        } else {
-            topEl.innerHTML = analyticsData.top_products.map((p, i) => `
-                <div style="display: flex; align-items: center; gap: 0.9rem; padding: 0.8rem; background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9;">
-                    <div style="width: 32px; height: 32px; background: ${i===0?'#f59e0b':i===1?'#94a3b8':i===2?'#d97706':'#e2e8f0'}; color: ${i<3?'white':'#64748b'}; border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 0.85rem;">${i+1}</div>
-                    <div style="flex: 1;"><div style="font-weight: 600; font-size: 0.9rem;">${p.name}</div><div style="font-size: 0.75rem; color: #64748b;">${p.qty} sold • R${p.revenue}</div></div>
-                    <div style="font-weight: 700; color: #059669;">R${p.revenue}</div>
-                </div>
-            `).join('');
-        }
-
-    } catch (e) {
-        console.error('Analytics load failed', e);
-    }
+        if (topEl) { if (analyticsData.top_products.length === 0) { topEl.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 1.5rem;">No sales yet.</p>'; } else { topEl.innerHTML = analyticsData.top_products.map((p,i) => `<div style="display: flex; align-items: center; gap: 0.9rem; padding: 0.8rem; background: #f8fafc; border-radius: 12px;"><div style="width: 32px; height: 32px; background: ${i===0?'#f59e0b':i===1?'#94a3b8':'#e2e8f0'}; color: ${i<3?'white':'#64748b'}; border-radius: 8px; display: grid; place-items: center; font-weight: 700;">${i+1}</div><div style="flex: 1;"><div style="font-weight: 600; font-size: 0.9rem;">${p.name}</div><div style="font-size: 0.75rem; color: #64748b;">${p.qty} sold • R${p.revenue}</div></div><div style="font-weight: 700; color: #059669;">R${p.revenue}</div></div>`).join(''); } }
+    } catch(e){ console.error(e); }
 }
 
-// Save products
+// Photo upload handling
+const photoDrop = document.getElementById('photoDrop');
+const photoInput = document.getElementById('photoInput');
+const previewImg = document.getElementById('previewImg');
+const previewName = document.getElementById('previewName');
+const photoPreview = document.getElementById('photoPreview');
+const uploadPrompt = document.getElementById('uploadPrompt');
+
+photoDrop?.addEventListener('click', () => photoInput.click());
+photoDrop?.addEventListener('dragover', (e) => { e.preventDefault(); photoDrop.classList.add('dragover'); });
+photoDrop?.addEventListener('dragleave', () => photoDrop.classList.remove('dragover'));
+photoDrop?.addEventListener('drop', (e) => { e.preventDefault(); photoDrop.classList.remove('dragover'); const files = e.dataTransfer.files; if (files.length) { photoInput.files = files; handlePreview(files[0]); } });
+photoInput?.addEventListener('change', () => { if (photoInput.files.length) handlePreview(photoInput.files[0]); });
+
+function handlePreview(file) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { previewImg.src = e.target.result; previewName.textContent = file.name + ` (${(file.size/1024).toFixed(0)}KB)`; photoPreview.style.display = 'block'; uploadPrompt.style.display = 'none'; };
+    reader.readAsDataURL(file);
+}
+
+document.querySelector('select[name="special"]')?.addEventListener('change', (e) => {
+    document.getElementById('specialPriceWrap').style.display = e.target.value === 'true' ? 'block' : 'none';
+});
+
+// Add product form
+document.getElementById('addProductForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const status = document.getElementById('addStatus');
+    status.textContent = '⏳ Adding product...';
+    status.style.color = '#64748b';
+
+    try {
+        const res = await fetch('/api/admin/products/add?key={{ request.args.get("key","changeme") }}', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+            status.textContent = `✅ Added: ${data.product.name} — Profit: R${data.product.profit || 0} (${data.product.profit_margin || 0}%)`;
+            status.style.color = '#059669';
+            form.reset();
+            photoPreview.style.display = 'none';
+            uploadPrompt.style.display = 'block';
+            document.getElementById('specialPriceWrap').style.display = 'none';
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            status.textContent = '❌ ' + data.error;
+            status.style.color = '#ef4444';
+        }
+    } catch(err) {
+        status.textContent = '❌ Error: ' + err.message;
+        status.style.color = '#ef4444';
+    }
+});
+
+// Save all
 document.getElementById('saveProducts')?.addEventListener('click', async () => {
     const cards = document.querySelectorAll('.edit-card');
     const products = [];
     cards.forEach(card => {
         const nameEl = card.querySelector('strong');
-        products.push({
-            id: parseInt(card.dataset.id),
-            name: nameEl.textContent,
-            category: card.querySelector('.badge').textContent,
-            price: parseFloat(card.querySelector('.edit-price').value),
-            special: card.querySelector('.edit-special').value === 'true',
-            special_price: parseFloat(card.querySelector('.edit-special-price').value),
-            image: card.querySelector('.edit-image').value,
-            unit: 'unit',
-            in_stock: true
-        });
+        products.push({ id: parseInt(card.dataset.id), name: nameEl.textContent, category: card.querySelector('.badge').textContent, price: parseFloat(card.querySelector('.edit-price').value), special: card.querySelector('.edit-special').value === 'true', special_price: parseFloat(card.querySelector('.edit-special-price').value), image: card.querySelector('img')?.src.split('/').pop() || 'rice.jpg', unit: 'unit', in_stock: true });
     });
-
     const status = document.getElementById('saveStatus');
     status.textContent = 'Saving...';
-
-    const res = await fetch('/api/admin/products/update?key={{ request.args.get("key","changeme") }}', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({key: '{{ request.args.get("key","changeme") }}', products})
-    });
-
+    const res = await fetch('/api/admin/products/update?key={{ request.args.get("key","changeme") }}', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: '{{ request.args.get("key","changeme") }}', products}) });
     const data = await res.json();
-    if (data.success) {
-        status.textContent = '✅ Saved! Products updated.';
-        status.style.color = '#059669';
-        setTimeout(() => location.reload(), 1000);
-    } else {
-        status.textContent = '❌ Error: ' + data.error;
-        status.style.color = '#ef4444';
-    }
+    status.textContent = data.success ? '✅ Saved!' : '❌ ' + data.error;
+    status.style.color = data.success ? '#059669' : '#ef4444';
+});
+
+// Delete
+document.querySelectorAll('.delete-one').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        if (!confirm('Delete this product?')) return;
+        const id = btn.dataset.id;
+        const res = await fetch(`/api/admin/products/delete/${id}?key={{ request.args.get("key","changeme") }}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) location.reload();
+        else alert('Error: ' + data.error);
+    });
 });
 
 document.getElementById('refreshBtn')?.addEventListener('click', () => location.reload());
-
-// Load analytics on page load
 loadAnalytics();
 </script>
 {% endif %}
