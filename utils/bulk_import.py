@@ -54,7 +54,7 @@ def import_excel(path):
         except Exception as e:
             print(f"Skip row {data}: {e}")
 
-    Path("products.json").write_text(json.dumps(products, indent=2))
+    Path("../products.json").write_text(json.dumps(products, indent=2))
     print(f"✅ Imported {len(products)} products to products.json")
 
 
@@ -81,7 +81,7 @@ def import_csv(path):
             except Exception as e:
                 print(f"Skip row {row}: {e}")
 
-    Path("products.json").write_text(json.dumps(products, indent=2))
+    Path("../products.json").write_text(json.dumps(products, indent=2))
     print(f"✅ Imported {len(products)} products to products.json")
 
 
