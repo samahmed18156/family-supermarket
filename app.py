@@ -18,10 +18,8 @@ def format_time(t):
     return f"{display_hour}:{minute:02d}{period}"
 
 
-def get_store_status():
-    """Check if the store is currently open based on Cape Town time."""
-    now = datetime.now(ZoneInfo("Africa/Johannesburg"))
-    day = now.weekday()  # 0 = Monday, 6 = Sunday
+def get_store_status(now):
+    day = now.weekday()
     current_time = now.time()
 
     # 👇 Change these hours if needed 👇
@@ -42,10 +40,25 @@ def get_store_status():
     return {"is_open": is_open, "message": message}
 
 
+STORE_HOURS = {
+    "Monday": "8am – 6pm",
+    "Tuesday": "8am – 6pm",
+    "Wednesday": "8am – 6pm",
+    "Thursday": "8am – 6pm",
+    "Friday": "8am – 6pm",
+    "Saturday": "8am – 5pm",
+    "Sunday": "9am – 2pm",
+}
+
+
 @app.context_processor
 def inject_store_status():
-    """Makes store_status available in every template automatically."""
-    return {"store_status": get_store_status()}
+    now = datetime.now(ZoneInfo("Africa/Johannesburg"))
+    return {
+        "store_status": get_store_status(now),
+        "store_hours": STORE_HOURS,
+        "today_name": now.strftime("%A"),
+    }
 
 
 @app.route("/", methods=["GET", "POST"])
