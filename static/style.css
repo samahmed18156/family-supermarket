@@ -438,3 +438,15 @@ footer {
         right: 20px;
     }
 }
+/* Nicer links inside paragraphs */
+main p a {
+    color: #059669;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+main p a:hover {
+    color: #047857;
+}
