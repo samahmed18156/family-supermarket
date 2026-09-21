@@ -3,121 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Specials - Family Supermarket</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>">
-        <meta name="description" content="Family Supermarket & Wholesalers — your local supermarket in Retreat, Cape Town. Fresh produce, groceries, and wholesale prices. Visit us at 58 5th Ave.">
-    <meta name="keywords" content="supermarket Retreat, wholesale Cape Town, groceries Retreat, Family Supermarket, spaza shop supplier">
-    <meta name="author" content="Family Supermarket & Wholesalers">
-
-    <!-- Social Media Preview (WhatsApp, Facebook, etc.) -->
-    <meta property="og:title" content="Family Supermarket & Wholesalers">
-    <meta property="og:description" content="Your local supermarket in Retreat, Cape Town. Fresh groceries and wholesale prices.">
-    <meta property="og:type" content="website">
+    <title>Specials — Family Supermarket</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-                        <a href="/" class="logo">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-                <span class="logo-text">
-                    <span class="logo-title">Family Supermarket</span>
-                    <span class="logo-subtitle">& Wholesalers</span>
-                </span>
-            </a>
+            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Specials</span></div></a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/about">About</a>
-                <a href="/specials">Specials</a>
+                <a href="/" class="nav-link">Shop</a>
+                <a href="/specials" class="nav-link active">Specials</a>
+                <a href="/about" class="nav-link">About</a>
             </div>
         </div>
     </nav>
 
-    <header>
-        <h1>Weekly Specials</h1>
-        <p>Fresh deals every week — come grab them before they're gone!</p>
-    </header>
+    <section class="hero" style="min-height: 60vh;">
+        <div class="hero-bg"><div class="hero-blob"></div><div class="hero-blob"></div></div>
+        <div class="hero-content" style="grid-template-columns: 1fr; text-align: center; max-width: 700px; margin: 0 auto;">
+            <div class="reveal">
+                <div style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">🔥 THIS WEEK ONLY</div>
+                <h1 style="text-align: center;">Save big on<br><span>essentials</span></h1>
+                <p style="margin: 0 auto; text-align: center;">{{ specials|length }} hand-picked specials. Python auto-calculates your savings. Bulk deals available in-store.</p>
+            </div>
+        </div>
+    </section>
 
-    <main>
-        <div class="card">
-            <h2>🔥 This Week's Deals</h2>
-            <p>Prices valid while stocks last. Visit us in-store for even more deals!</p>
-
-                        <div class="gallery">
-                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/vegetables.jpg') }}" alt="Fresh Vegetables">
-                    <div class="gallery-caption">
-                        <h3>Fresh Vegetables</h3>
-                        <p>From R9.99 / kg</p>
-                    </div>
+    <section class="section">
+        <div class="product-grid">
+            {% for product in specials %}
+            <div class="product-card reveal" style="border: 2px solid #fde68a;">
+                <div class="product-image-wrap">
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}">
+                    <span class="product-badge special">🔥 SPECIAL</span>
                 </div>
-
-                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/bread.jpg') }}" alt="Fresh Bread">
-                    <div class="gallery-caption">
-                        <h3>Fresh Bread</h3>
-                        <p>From R15.99</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/drinks.jpg') }}" alt="Cold Drinks">
-                    <div class="gallery-caption">
-                        <h3>Cold Drinks 2L</h3>
-                        <p>2 for R30</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/rice.jpg') }}" alt="Rice">
-                    <div class="gallery-caption">
-                        <h3>Rice 10kg</h3>
-                        <p>R129.99</p>
-                    </div>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/oil.jpg') }}" alt="Cooking Oil">
-                    <div class="gallery-caption">
-                        <h3>Cooking Oil 2L</h3>
-                        <p>R59.99</p>
-                    </div>
-                </div>
-
-                                <div class="gallery-item">
-                    <img src="{{ url_for('static', filename='images/snacks.jpg') }}" alt="Snacks">
-                    <div class="gallery-caption">
-                        <h3>Chips & Snacks</h3>
-                        <p>Buy 2 get 1 free</p>
+                <div class="product-info">
+                    <div class="product-category">SAVE R{{ (product.price - product.special_price)|round|int }} • Limited</div>
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <div class="product-meta">
+                        <div class="product-price">
+                            <span class="price-current" style="color: #d97706;">R{{ product.special_price }}</span>
+                            <span class="price-old">R{{ product.price }}</span>
+                            <span class="price-save">-{{ ((1 - product.special_price/product.price)*100)|round|int }}%</span>
+                        </div>
+                        <button class="add-btn" style="background: #d97706;" onclick="window.open('https://wa.me/27796232189?text=I%20want%20SPECIAL%20{{ product.name }}%20for%20R{{ product.special_price }}', '_blank')">+</button>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-    </main>
+    </section>
 
-    <footer>
-        <p>© 2024 Family Supermarket & Wholesalers. All rights reserved.</p>
-    </footer>
-
-    <!-- Floating WhatsApp Button -->
-        <!-- Floating Call Button -->
-    <a href="tel:0796232189" class="call-btn" aria-label="Call us">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-        </svg>
-    </a>
-    <a href="https://wa.me/27796232189?text=Hi%20Family%20Supermarket!%20I%20have%20a%20question."
-       class="whatsapp-btn"
-       target="_blank"
-       aria-label="Chat on WhatsApp">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        <span>Chat with us</span>
-    </a>
-</body>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e971a21cc3c13d',t:'MTc4OTk5NzYyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

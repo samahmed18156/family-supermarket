@@ -3,76 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Family Supermarket & Wholesalers</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>">
-        <meta name="description" content="Family Supermarket & Wholesalers — your local supermarket in Retreat, Cape Town. Fresh produce, groceries, and wholesale prices. Visit us at 58 5th Ave.">
-    <meta name="keywords" content="supermarket Retreat, wholesale Cape Town, groceries Retreat, Family Supermarket, spaza shop supplier">
-    <meta name="author" content="Family Supermarket & Wholesalers">
-
-    <!-- Social Media Preview (WhatsApp, Facebook, etc.) -->
-    <meta property="og:title" content="Family Supermarket & Wholesalers">
-    <meta property="og:description" content="Your local supermarket in Retreat, Cape Town. Fresh groceries and wholesale prices.">
-    <meta property="og:type" content="website">
+    <title>About — Family Supermarket</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-                        <a href="/" class="logo">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-                <span class="logo-text">
-                    <span class="logo-title">Family Supermarket</span>
-                    <span class="logo-subtitle">& Wholesalers</span>
-                </span>
-            </a>
+            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Our Story</span></div></a>
             <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/about">About</a>
-            <a href="/specials">Specials</a>
+                <a href="/" class="nav-link">Shop</a>
+                <a href="/specials" class="nav-link">Specials</a>
+                <a href="/about" class="nav-link active">About</a>
             </div>
         </div>
     </nav>
 
-    <header>
-        <h1>About Us</h1>
-        <p>Serving the Retreat community with quality and care</p>
-    </header>
+    <section class="section" style="padding-top: 8rem;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <h1 class="section-title reveal" style="font-size: 3.5rem; margin-bottom: 2rem;">Family owned.<br>Community loved.<br><span style="background: linear-gradient(135deg, #059669, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Since 2018.</span></h1>
 
-    <main>
-        <div class="card">
-            <h2>Welcome to Family Supermarket & Wholesalers</h2>
-            <p>We are a family-owned supermarket located in the heart of Retreat, Cape Town. For years, we have been providing our local community with fresh produce, everyday groceries, and wholesale options at affordable prices.</p>
-            <br>
-            <p>Whether you are shopping for your family or stocking up your spaza shop, we pride ourselves on friendly service, quality products, and a convenient shopping experience.</p>
-            <br>
-            <p><strong>Come visit us today at 58 5th Ave!</strong></p>
+            <div class="reveal" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: var(--shadow-md); margin: 2.5rem 0; border: 1px solid #e2e8f0;">
+                <p style="font-size: 1.15rem; line-height: 1.7; color: #334155;">Family Supermarket & Wholesalers started with one simple idea: <strong>Retreat deserves a supermarket that treats you like family, with wholesale prices everyone can afford.</strong></p>
+                <br>
+                <p style="line-height: 1.7; color: #64748b;">Located at 58 5th Ave, we've grown from a small corner shop to Retreat's go-to for fresh produce, groceries, and bulk deals. No fancy corporate tricks — just honest prices, fresh stock daily, and service that remembers your name.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0;" class="reveal">
+                <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🥬</div>
+                    <div style="font-weight: 600;">Fresh Daily</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">Produce from local farms</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+                    <div style="font-weight: 600;">Wholesale Prices</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">Bulk = More savings</div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">❤️</div>
+                    <div style="font-weight: 600;">Family Service</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">We know our customers</div>
+                </div>
+            </div>
         </div>
-    </main>
-
-        <footer>
-        <p>© 2025 Family Supermarket & Wholesalers. All rights reserved.</p>
-    </footer>
-
-    <!-- Floating Call Button -->
-    <a href="tel:0796232189" class="call-btn" aria-label="Call us">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-        </svg>
-    </a>
-
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/27796232189?text=Hi%20Family%20Supermarket!%20I%20have%20a%20question."
-       class="whatsapp-btn"
-       target="_blank"
-       aria-label="Chat on WhatsApp">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        <span>Chat with us</span>
-    </a>
+    </section>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
