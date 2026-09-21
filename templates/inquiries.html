@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inquiries - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span class="logo-text">
+                    <span class="logo-title">Family Supermarket</span>
+                    <span class="logo-subtitle">& Wholesalers</span>
+                </span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+                <a href="/specials">Specials</a>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>📬 Customer Inquiries</h1>
+        <p>{{ inquiries|length }} total submission{{ '' if inquiries|length == 1 else 's' }}</p>
+    </header>
+
+    <main>
+        {% if inquiries %}
+            {% for inq in inquiries %}
+                <div class="card">
+                    <h2>{{ inq['name'] }}</h2>
+                    <p><strong>📧 Email:</strong> <a href="mailto:{{ inq['email'] }}">{{ inq['email'] }}</a></p>
+                    <p><strong>🕐 When:</strong> {{ inq['created_at'] }}</p>
+                    <p style="margin-top: 1rem;"><strong>💬 Message:</strong></p>
+                    <p style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; white-space: pre-wrap;">{{ inq['message'] }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <h2>No inquiries yet</h2>
+                <p>When customers submit the form, their messages will appear here.</p>
+            </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>© 2025 Family Supermarket & Wholesalers. Admin view.</p>
+    </footer>
+</body>
+</html>

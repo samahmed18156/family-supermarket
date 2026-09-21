@@ -90,10 +90,17 @@
             <h2>Send us a message</h2>
             <p>Have a question or want to place a bulk order? Leave your name and we'll get back to you!</p>
             <form method="POST">
-                <label for="username">Your Name:</label>
-                <input type="text" id="username" name="username" placeholder="e.g. John Doe" required>
-                <button type="submit">Submit Inquiry</button>
-            </form>
+    <label for="username">Your Name:</label>
+    <input type="text" id="username" name="username" placeholder="e.g. John Doe" required>
+
+    <label for="email">Your Email:</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+    <label for="message">Your Message:</label>
+    <textarea id="message" name="message" rows="4" placeholder="What can we help you with?" required></textarea>
+
+    <button type="submit">Submit Inquiry</button>
+</form>
 
                         {% if greeting %}
                 <p class="greeting">Thanks, {{ greeting }}! Your message has been noted. Please WhatsApp or call us for a faster response.</p>
