@@ -19,6 +19,14 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL, email TEXT NOT NULL,
         message TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_name TEXT,
+        customer_phone TEXT,
+        items TEXT NOT NULL,
+        total REAL NOT NULL,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
     conn.commit()
     conn.close()
 
@@ -36,7 +44,7 @@ def load_products():
          "image": "oil.jpg", "in_stock": True, "special": True, "special_price": 55},
         {"id": 4, "name": "Rice 10kg", "category": "Staples", "price": 129.99, "unit": "bag", "image": "rice.jpg",
          "in_stock": True, "special": False},
-        {"id": 5, "name": "Mixed Snacks", "category": "Snacks", "price": 35, "unit": "pack", "image": "snacks.jpg",
+        {"id": 5, "name": "Mixed Snacks Pack", "category": "Snacks", "price": 35, "unit": "pack", "image": "snacks.jpg",
          "in_stock": True, "special": False},
         {"id": 6, "name": "Fresh Vegetables Combo", "category": "Produce", "price": 49.99, "unit": "combo",
          "image": "vegetables.jpg", "in_stock": True, "special": True, "special_price": 39.99},
@@ -63,6 +71,38 @@ def get_all_inquiries():
     rows = cur.fetchall()
     conn.close()
     return rows
+
+
+def get_all_orders():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM orders ORDER BY created_at DESC")
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+def get_stats():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM inquiries")
+    total_inq = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM inquiries WHERE date(created_at) = date('now')")
+    today_inq = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM orders")
+    total_orders = cur.fetchone()[0]
+    cur.execute("SELECT COALESCE(SUM(total),0) FROM orders")
+    total_revenue = cur.fetchone()[0]
+    conn.close()
+    return {
+        "total_inquiries": total_inq,
+        "today_inquiries": today_inq,
+        "total_orders": total_orders,
+        "total_revenue": round(total_revenue, 2),
+        "total_products": len(load_products()),
+        "specials_count": len([p for p in load_products() if p.get('special')])
+    }
 
 
 STORE_HOURS = {
@@ -137,27 +177,94 @@ def about():
     return render_template("about.html")
 
 
-# ✅ FIXED: inquiries route was missing!
 @app.route("/inquiries")
 def inquiries():
     key = request.args.get("key")
     expected = os.getenv("ADMIN_KEY", "changeme")
-    # Allow viewing without key in debug, require key in production
-    if os.getenv("FLASK_ENV") == "production" and key != expected:
-        return "🔒 Not authorized. Add ?key=YOUR_KEY to the URL.", 403
-    if key and key != expected and os.getenv("FLASK_ENV") != "production":
-        # still check if key provided but wrong
-        if key != expected:
-            return "🔒 Wrong key. Check ADMIN_KEY.", 403
-
+    if key != expected:
+        # redirect to new admin
+        return render_template("admin.html", inquiries=get_all_inquiries(), orders=get_all_orders(), stats=get_stats(),
+                               is_authorized=False, products=load_products())
     all_inq = get_all_inquiries()
     return render_template("inquiries.html", inquiries=all_inq)
 
 
+# ===== NEW: ADMIN DASHBOARD =====
+@app.route("/admin")
+def admin():
+    key = request.args.get("key")
+    expected = os.getenv("ADMIN_KEY", "changeme")
+    is_auth = key == expected
+    return render_template("admin.html",
+                           inquiries=get_all_inquiries(),
+                           orders=get_all_orders(),
+                           stats=get_stats(),
+                           is_authorized=is_auth,
+                           products=load_products())
+
+
+# ===== CART & ORDERS API =====
 @app.route("/api/products")
 def api_products():
     return jsonify(get_products(category=request.args.get('category'), search_query=request.args.get('q'),
                                 specials_only=request.args.get('specials') == 'true'))
+
+
+@app.route("/api/checkout", methods=["POST"])
+def api_checkout():
+    data = request.get_json()
+    if not data or not data.get('items'):
+        return jsonify({"success": False, "error": "Cart empty"}), 400
+
+    items = data['items']
+    total = data.get('total', 0)
+    name = data.get('name', 'Guest')
+    phone = data.get('phone', '')
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("INSERT INTO orders (customer_name, customer_phone, items, total) VALUES (?,?,?,?)",
+                 (name, phone, json.dumps(items), total))
+    conn.commit()
+    conn.close()
+
+    # Generate WhatsApp message
+    wa_text = f"Hi Family Supermarket! New order from {name}:\n"
+    for item in items:
+        wa_text += f"- {item['name']} x{item['qty']} = R{item['price'] * item['qty']:.2f}\n"
+    wa_text += f"\nTotal: R{total:.2f}\nPhone: {phone}"
+
+    return jsonify({
+        "success": True,
+        "order_id": "FS-" + datetime.now().strftime("%Y%m%d%H%M"),
+        "whatsapp_url": f"https://wa.me/27796232189?text={wa_text}"
+    })
+
+
+@app.route("/api/admin/products/update", methods=["POST"])
+def api_update_products():
+    key = request.args.get("key") or request.json.get("key")
+    expected = os.getenv("ADMIN_KEY", "changeme")
+    if key != expected:
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+
+    new_products = request.json.get("products")
+    if not new_products:
+        return jsonify({"success": False, "error": "No products"}), 400
+
+    # Validate
+    try:
+        # Save to file
+        Path("products.json").write_text(json.dumps(new_products, indent=2))
+        # Clear cache
+        load_products.cache_clear()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/stats")
+def api_stats():
+    return jsonify(get_stats())
 
 
 @app.route("/sitemap.xml")

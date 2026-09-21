@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Specials — Family Supermarket</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .cart-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+        .cart-overlay.active { opacity: 1; pointer-events: auto; }
+        .cart-drawer { position: fixed; top: 0; right: 0; width: 420px; max-width: 90vw; height: 100vh; background: white; z-index: 2001; transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .cart-drawer.active { transform: translateX(0); }
+        .cart-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 1rem; }
+        .cart-footer { padding: 1.5rem; border-top: 1px solid #e2e8f0; }
+        .cart-count { position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; font-weight: 700; display: grid; place-items: center; transform: scale(0); transition: transform 0.3s; }
+        .cart-count.show { transform: scale(1); }
+        .cart-btn-wrap { position: relative; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -14,9 +26,22 @@
                 <a href="/" class="nav-link">Shop</a>
                 <a href="/specials" class="nav-link active">Specials</a>
                 <a href="/about" class="nav-link">About</a>
+                <a href="/admin?key=changeme" class="nav-link">Admin</a>
+                <div class="cart-btn-wrap"><button id="cartBtn" class="btn btn-primary" style="padding: 0.6rem 1.2rem; margin-left: 0.5rem;"><span>🛒 Cart</span><span id="cartCount" class="cart-count">0</span></button></div>
             </div>
         </div>
     </nav>
+
+    <div id="cartOverlay" class="cart-overlay"></div>
+    <div id="cartDrawer" class="cart-drawer">
+        <div class="cart-header"><div><h3 style="font-family: 'Space Grotesk';">Your Cart</h3><p style="font-size: 0.85rem; color: #64748b;"><span id="cartItemCount">0</span> items</p></div><button id="closeCart" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e2e8f0; background: white; cursor: pointer;">✕</button></div>
+        <div id="cartItems" class="cart-items"></div>
+        <div class="cart-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-weight: 700;"><span>Total</span><span id="cartTotal">R0.00</span></div>
+            <input type="text" id="customerName" placeholder="Your name" style="width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 0.75rem;">
+            <button id="checkoutBtn" class="btn btn-primary" style="width: 100%; justify-content: center;"><span>Checkout via WhatsApp →</span></button>
+        </div>
+    </div>
 
     <section class="hero" style="min-height: 60vh;">
         <div class="hero-bg"><div class="hero-blob"></div><div class="hero-blob"></div></div>
@@ -24,7 +49,7 @@
             <div class="reveal">
                 <div style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">🔥 THIS WEEK ONLY</div>
                 <h1 style="text-align: center;">Save big on<br><span>essentials</span></h1>
-                <p style="margin: 0 auto; text-align: center;">{{ specials|length }} hand-picked specials. Python auto-calculates your savings. Bulk deals available in-store.</p>
+                <p style="margin: 0 auto; text-align: center;">{{ specials|length }} specials • Add to cart and checkout via WhatsApp</p>
             </div>
         </div>
     </section>
@@ -32,7 +57,7 @@
     <section class="section">
         <div class="product-grid">
             {% for product in specials %}
-            <div class="product-card reveal" style="border: 2px solid #fde68a;">
+            <div class="product-card reveal" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.special_price }}" data-image="{{ product.image }}" style="border: 2px solid #fde68a;">
                 <div class="product-image-wrap">
                     <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}">
                     <span class="product-badge special">🔥 SPECIAL</span>
@@ -41,12 +66,8 @@
                     <div class="product-category">SAVE R{{ (product.price - product.special_price)|round|int }} • Limited</div>
                     <h3 class="product-name">{{ product.name }}</h3>
                     <div class="product-meta">
-                        <div class="product-price">
-                            <span class="price-current" style="color: #d97706;">R{{ product.special_price }}</span>
-                            <span class="price-old">R{{ product.price }}</span>
-                            <span class="price-save">-{{ ((1 - product.special_price/product.price)*100)|round|int }}%</span>
-                        </div>
-                        <button class="add-btn" style="background: #d97706;" onclick="window.open('https://wa.me/27796232189?text=I%20want%20SPECIAL%20{{ product.name }}%20for%20R{{ product.special_price }}', '_blank')">+</button>
+                        <div class="product-price"><span class="price-current" style="color: #d97706;">R{{ product.special_price }}</span><span class="price-old">R{{ product.price }}</span><span class="price-save">-{{ ((1 - product.special_price/product.price)*100)|round|int }}%</span></div>
+                        <button class="add-btn add-to-cart" data-id="{{ product.id }}">+</button>
                     </div>
                 </div>
             </div>
@@ -55,4 +76,6 @@
     </section>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='cart.js') }}"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e9a6c98ef3c479',t:'MTc4OTk5OTgwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
