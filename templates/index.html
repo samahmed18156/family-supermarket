@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Supermarket & Wholesalers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Family Supermarket</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <h1>Family Supermarket & Wholesalers</h1>
+        <p>Your local supermarket in Retreat, Cape Town</p>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Store Information</h2>
+            <div class="info-grid">
+                <p><strong>📍 Address:</strong><br>58 5th Ave, Retreat, Cape Town, 7965</p>
+                <p><strong>📞 Phone:</strong><br><a href="tel:0796232189">079 623 2189</a></p>
+                <p><strong>🕒 Hours:</strong><br>Open · Closes 6 pm</p>
+                <p><strong>⭐ Rating:</strong><br>4.3 / 5 (11 reviews)</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Send us a message</h2>
+            <p>Have a question or want to place a bulk order? Leave your name and we'll get back to you!</p>
+            <form method="POST">
+                <label for="username">Your Name:</label>
+                <input type="text" id="username" name="username" placeholder="e.g. John Doe" required>
+                <button type="submit">Submit Inquiry</button>
+            </form>
+
+            {% if greeting %}
+                <p class="greeting">Thanks, {{ greeting }}! We will be in touch soon.</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Family Supermarket & Wholesalers. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
