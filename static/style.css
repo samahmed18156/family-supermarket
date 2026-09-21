@@ -35,10 +35,42 @@ body {
 }
 
 .logo {
-    font-weight: 600;
-    font-size: 1.2rem;
-    color: #059669; /* Green */
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #059669;
     text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.logo:hover {
+    transform: scale(1.03);
+}
+
+.logo svg {
+    flex-shrink: 0;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.logo-title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #059669;
+    letter-spacing: -0.3px;
+}
+
+.logo-subtitle {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
 }
 
 .nav-links {
