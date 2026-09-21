@@ -18,5 +18,10 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/specials")
+def specials():
+    return render_template("specials.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
