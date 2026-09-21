@@ -471,6 +471,94 @@ def api_delete_product(product_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@app.route("/api/admin/products/edit/<int:product_id>", methods=["POST"])
+def api_edit_product(product_id):
+    """Edit existing product - change photo, SOH, cost, all fields - FREE"""
+    key = request.form.get("key") or request.args.get("key")
+    expected = os.getenv("ADMIN_KEY", "changeme")
+    if key != expected:
+        return jsonify({"success": False, "error": "Unauthorized"}), 403
+
+    try:
+        products = load_products()
+        product = next((p for p in products if p.get('id') == product_id), None)
+        if not product:
+            return jsonify({"success": False, "error": "Product not found"}), 404
+
+        # Update fields if provided
+        if request.form.get("name"):
+            product["name"] = request.form.get("name").strip()
+        if request.form.get("category"):
+            product["category"] = request.form.get("category").strip()
+        if request.form.get("price"):
+            product["price"] = float(request.form.get("price"))
+        if request.form.get("cost_price") != None:
+            try:
+                product["cost_price"] = float(request.form.get("cost_price") or 0)
+            except:
+                pass
+        if request.form.get("stock") != None:
+            try:
+                product["stock"] = int(request.form.get("stock") or 0)
+                product["in_stock"] = product["stock"] > 0
+            except:
+                pass
+        if request.form.get("unit"):
+            product["unit"] = request.form.get("unit").strip()
+        if request.form.get("description") != None:
+            product["description"] = request.form.get("description").strip()
+        if request.form.get("sku"):
+            product["sku"] = request.form.get("sku").strip()
+        if request.form.get("barcode") != None:
+            product["barcode"] = request.form.get("barcode").strip()
+        if request.form.get("special") != None:
+            product["special"] = request.form.get("special") == "true"
+        if request.form.get("special_price"):
+            try:
+                product["special_price"] = float(request.form.get("special_price"))
+            except:
+                pass
+
+        # Handle new photo upload - CHANGE IMAGE
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                ext = filename.rsplit('.', 1)[1].lower()
+                base = secure_filename(product["name"].lower().replace(' ', '-'))[:20]
+                unique_name = f"{base}-{datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+                file_path = UPLOAD_FOLDER / unique_name
+                file.save(file_path)
+                image_filename = unique_name
+
+                # WebP conversion
+                try:
+                    from PIL import Image
+                    img = Image.open(file_path)
+                    img = img.convert("RGB")
+                    webp_path = UPLOAD_FOLDER / f"{Path(unique_name).stem}.webp"
+                    img.save(webp_path, "WEBP", quality=80)
+                    image_filename = f"{Path(unique_name).stem}.webp"
+                except:
+                    pass
+
+                product["image"] = image_filename
+
+        # Recalculate profit
+        if product.get("cost_price", 0) > 0:
+            product["profit"] = round(product["price"] - product["cost_price"], 2)
+            product["profit_margin"] = round(((product["price"] - product["cost_price"]) / product["price"] * 100), 1)
+
+        # Save
+        Path("products.json").write_text(json.dumps(products, indent=2))
+        load_products.cache_clear()
+
+        return jsonify({"success": True, "product": product})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route("/api/admin/stats")
 def api_stats():
     return jsonify(get_stats())
