@@ -399,13 +399,9 @@ footer {
     color: #047857;
 }
 
-.hours-table tr.today td::before {
-    content: "▶ ";
-    color: #059669;
-}
-
 .hours-table tr.today td:first-child::before {
     content: "▶ ";
+    color: #059669;
 }
 /* --- Floating Call Button --- */
 .call-btn {
