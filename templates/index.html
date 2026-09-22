@@ -1,12 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-ZA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Supermarket & Wholesalers — Retreat, Cape Town</title>
-    <meta name="description" content="Fresh groceries, wholesale prices. 6 categories, {{ specials_count }} weekly specials. Open now in Retreat, Cape Town.">
+
+    <!-- PRIMARY SEO - Better SEO / meta -->
+    <title>Family Supermarket & Wholesalers — Fresh Groceries in Retreat, Cape Town | 500+ Products</title>
+    <meta name="description" content="Family Supermarket in Retreat, Cape Town — Fresh groceries, wholesale prices, 500+ products, {{ specials_count }} weekly specials. 58 5th Ave, Retreat, 7965. Open 8am-6pm Mon-Fri, 8am-5pm Sat, 9am-2pm Sun. Order via WhatsApp ☎ {{ business_phone_display }} — Delivery around Retreat.">
+    <meta name="keywords" content="Family Supermarket Retreat, supermarket Cape Town, wholesalers Retreat, groceries Retreat, fresh produce Cape Town, wholesale prices Retreat, 5th Ave Retreat supermarket, bread Retreat, rice Retreat, vegetables Retreat, Retreat grocery store, Cape Town wholesalers, bulk groceries Retreat">
+    <meta name="author" content="Family Supermarket & Wholesalers">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="{{ request.url_root.rstrip('/') }}/">
+
+    <!-- THEME & PWA - FREE SEO BOOST -->
+    <meta name="theme-color" content="#059669">
+    <meta name="msapplication-TileColor" content="#059669">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Family Market">
+    <meta name="application-name" content="Family Supermarket">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- PRECONNECT FOR SPEED (FREE SEO) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://wa.me">
+
+    <!-- OPEN GRAPH (Facebook, WhatsApp, LinkedIn) - FREE -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Family Supermarket & Wholesalers — Fresh Groceries in Retreat, Cape Town">
+    <meta property="og:description" content="Fresh groceries, wholesale prices. 500+ products, {{ specials_count }} weekly specials. 58 5th Ave, Retreat. Open now! Order via WhatsApp ☎ {{ business_phone_display }}. Delivery around Retreat.">
+    <meta property="og:url" content="{{ request.url_root.rstrip('/') }}/">
+    <meta property="og:site_name" content="Family Supermarket & Wholesalers">
+    <meta property="og:locale" content="en_ZA">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/rice.jpg') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Family Supermarket - Fresh groceries, wholesale prices in Retreat, Cape Town">
+    <meta property="og:image:type" content="image/jpeg">
+
+    <!-- TWITTER CARD -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Family Supermarket & Wholesalers — Retreat, Cape Town | Fresh Groceries">
+    <meta name="twitter:description" content="Fresh groceries, wholesale prices in Retreat. 500+ products, {{ specials_count }} specials. 58 5th Ave. Order via WhatsApp ☎ {{ business_phone_display }} — Delivery around Retreat.">
+    <meta name="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/rice.jpg') }}">
+    <meta name="twitter:image:alt" content="Family Supermarket Retreat">
+
+    <!-- GEO & LOCAL SEO - CRITICAL FOR RETREAT RANKING -->
+    <meta name="geo.region" content="ZA-WC">
+    <meta name="geo.placename" content="Retreat, Cape Town, Western Cape, South Africa">
+    <meta name="geo.position" content="-34.0552;18.4764">
+    <meta name="ICBM" content="-34.0552, 18.4764">
+
+    <!-- STYLES -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>\">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/rice.jpg') }}">
+
+    <!-- JSON-LD STRUCTURED DATA - LOCAL BUSINESS (FREE SEO GOLD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "GroceryStore",
+      "name": "Family Supermarket & Wholesalers",
+      "alternateName": "Family Supermarket Retreat",
+      "image": [
+        "{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/rice.jpg') }}",
+        "{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/vegetables.jpg') }}",
+        "{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/bread.jpg') }}"
+      ],
+      "description": "Family-owned supermarket in Retreat, Cape Town since 2018. Fresh groceries, wholesale prices, 500+ products, daily fresh produce, bakery, drinks, snacks. Serving Retreat community with family service.",
+      "url": "{{ request.url_root.rstrip('/') }}/",
+      "telephone": "+{{ business_whatsapp }}",
+      "priceRange": "R",
+      "currenciesAccepted": "ZAR",
+      "paymentAccepted": "Cash, Card, EFT",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "58 5th Ave",
+        "addressLocality": "Retreat",
+        "addressRegion": "Western Cape",
+        "postalCode": "7965",
+        "addressCountry": "ZA"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -34.0552,
+        "longitude": 18.4764
+      },
+      "openingHoursSpecification": [
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "17:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "14:00"}
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.3",
+        "reviewCount": "11",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Groceries & Wholesale",
+        "itemListElement": [
+          {% for cat in all_categories %}
+          {"@type": "OfferCatalog", "name": "{{ cat }}", "itemListElement": []}{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+      },
+      "sameAs": [
+        "https://wa.me/{{ business_whatsapp }}",
+        "{{ request.url_root.rstrip('/') }}/"
+      ],
+      "foundingDate": "2018",
+      "slogan": "Fresh groceries. Wholesale prices. Family service."
+    }
+    </script>
+
+    <!-- BREADCRUMB JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.url_root.rstrip('/') }}/"},
+        {"@type": "ListItem", "position": 2, "name": "Shop Groceries", "item": "{{ request.url_root.rstrip('/') }}/#products"},
+        {"@type": "ListItem", "position": 3, "name": "Specials", "item": "{{ request.url_root.rstrip('/') }}/specials"}
+      ]
+    }
+    </script>
+
+    <!-- PRODUCT LIST JSON-LD FOR SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Fresh Groceries - Family Supermarket Retreat",
+      "description": "500+ fresh groceries and wholesale products in Retreat, Cape Town",
+      "numberOfItems": {{ products|length }},
+      "itemListElement": [
+        {% for product in products[:10] %}
+        {
+          "@type": "ListItem",
+          "position": {{ loop.index }},
+          "item": {
+            "@type": "Product",
+            "name": "{{ product.name }}",
+            "category": "{{ product.category }}",
+            "image": "{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/' + product.image) }}",
+            "offers": {
+              "@type": "Offer",
+              "price": "{{ product.special_price if product.special else product.price }}",
+              "priceCurrency": "ZAR",
+              "availability": "https://schema.org/InStock",
+              "seller": {"@type": "Organization", "name": "Family Supermarket"}
+            }
+          }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }
+    </script>
+
     <style>
         /* CART DRAWER - Premium motion */
         .cart-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s var(--ease-smooth); }
@@ -26,15 +183,15 @@
     </style>
 </head>
 <body>
-    <!-- LUXURY POLISH - Progress + Custom Cursor (keeps good theme) -->
+    <!-- LUXURY POLISH - Progress + Custom Cursor -->
     <div class="progress-bar" id="progressBar"></div>
     <div class="cursor-dot" id="cursorDot"></div>
     <div class="cursor-ring" id="cursorRing"></div>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
+    <!-- NAVBAR - Semantic nav for SEO -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="/" class="logo">
+            <a href="/" class="logo" aria-label="Family Supermarket Home">
                 <div class="logo-icon">F</div>
                 <div class="logo-text">
                     <span class="logo-title">Family Supermarket</span>
@@ -42,12 +199,12 @@
                 </div>
             </a>
             <div class="nav-links">
-                <a href="/" class="nav-link active">Shop</a>
+                <a href="/" class="nav-link active" aria-current="page">Shop</a>
                 <a href="/specials" class="nav-link">Specials <span class="nav-badge">{{ specials_count }}</span></a>
                 <a href="/about" class="nav-link">About</a>
-                <a href="/admin?key=changeme" class="nav-link">Admin</a>
+                <a href="/admin?key=changeme" class="nav-link" rel="nofollow">Admin</a>
                 <div class="cart-btn-wrap">
-                    <button id="cartBtn" class="btn btn-primary" style="padding: 0.6rem 1.2rem; margin-left: 0.5rem;"><span>🛒 Cart</span><span id="cartCount" class="cart-count">0</span></button>
+                    <button id="cartBtn" class="btn btn-primary" style="padding: 0.6rem 1.2rem; margin-left: 0.5rem;" aria-label="View cart"><span>🛒 Cart</span><span id="cartCount" class="cart-count">0</span></button>
                 </div>
             </div>
         </div>
@@ -55,13 +212,13 @@
 
     <!-- CART DRAWER -->
     <div id="cartOverlay" class="cart-overlay"></div>
-    <div id="cartDrawer" class="cart-drawer">
+    <div id="cartDrawer" class="cart-drawer" role="dialog" aria-label="Shopping cart">
         <div class="cart-header">
             <div>
                 <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem;">Your Cart</h3>
                 <p style="font-size: 0.85rem; color: #64748b;"><span id="cartItemCount">0</span> items</p>
             </div>
-            <button id="closeCart" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e2e8f0; background: white; cursor: pointer; display: grid; place-items: center;">✕</button>
+            <button id="closeCart" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e2e8f0; background: white; cursor: pointer; display: grid; place-items: center;" aria-label="Close cart">✕</button>
         </div>
         <div id="cartItems" class="cart-items">
             <div id="emptyCart" style="text-align: center; padding: 3rem 1rem; color: #94a3b8;">
@@ -80,11 +237,12 @@
             <input type="text" id="customerName" placeholder="Your name" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 0.75rem;">
             <input type="text" id="customerPhone" placeholder="Phone (optional)" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem;">
             <button id="checkoutBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1rem;"><span>Checkout via WhatsApp →</span></button>
-            <p style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 0.75rem;">Secure checkout • We reply in 5 mins</p>
+            <p style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 0.75rem;">Secure checkout • We reply in 5 mins • 58 5th Ave, Retreat</p>
         </div>
     </div>
 
-    <!-- HERO -->
+    <!-- HERO - Semantic main + h1 for SEO -->
+    <main>
     <section class="hero">
         <div class="hero-bg">
             <div class="hero-blob"></div>
@@ -96,14 +254,14 @@
             <div class="hero-text reveal">
                 <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #e2e8f0; padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 500; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                     <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
-                    {{ store_status.message }} • 58 5th Ave, Retreat
+                    {{ store_status.message }} • 58 5th Ave, Retreat, Cape Town 7965
                 </div>
 
-                <h1>Fresh groceries.<br>Wholesale <span>prices.</span><br>Family service.</h1>
-                <p>Your neighborhood supermarket in Retreat, Cape Town. Add to cart, checkout via WhatsApp — delivered around Retreat.</p>
+                <h1>Fresh groceries.<br>Wholesale <span>prices.</span><br>Family service in Retreat.</h1>
+                <p>Your neighborhood supermarket in <strong>Retreat, Cape Town</strong> since 2018. 500+ products, {{ specials_count }} weekly specials. Add to cart, checkout via WhatsApp — delivered around Retreat, Steenberg, Lavender Hill.</p>
 
                 <div class="btn-group">
-                    <a href="#products" class="btn btn-primary"><span>Shop Now →</span></a>
+                    <a href="#products" class="btn btn-primary"><span>Shop Fresh Groceries →</span></a>
                     <button id="viewCartHero" class="btn btn-secondary">View Cart (<span class="cart-total-items">0</span>)</button>
                 </div>
 
@@ -114,16 +272,16 @@
                 </div>
             </div>
 
-            <div class="hero-visual">
+            <div class="hero-visual" aria-hidden="true">
                 <div class="hero-card hero-card-1" style="--rot: -2deg">
-                    <img src="{{ url_for('static', filename='images/rice.jpg') }}" alt="Rice">
+                    <img src="{{ url_for('static', filename='images/rice.jpg') }}" alt="Rice 10kg - Staples best seller at Family Supermarket Retreat" loading="eager">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div><div style="font-weight: 600; font-size: 0.95rem;">Rice 10kg</div><div style="font-size: 0.8rem; color: #64748b;">Staples • Best seller</div></div>
                         <div style="font-weight: 700; color: #059669;">R129.99</div>
                     </div>
                 </div>
                 <div class="hero-card hero-card-2" style="--rot: 3deg">
-                    <img src="{{ url_for('static', filename='images/vegetables.jpg') }}" alt="Vegetables">
+                    <img src="{{ url_for('static', filename='images/vegetables.jpg') }}" alt="Fresh Vegetables Combo - Save R10 at Family Supermarket Retreat" loading="eager">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div><div style="font-weight: 600; font-size: 0.95rem;">Veggie Combo</div><div style="font-size: 0.8rem; color: #64748b;">🔥 Save R10</div></div>
                         <div style="font-weight: 700; color: #d97706;">R39.99</div>
@@ -144,24 +302,24 @@
         </div>
     </section>
 
-    <!-- PRODUCTS -->
-    <section id="products" class="section">
+    <!-- PRODUCTS - Semantic section with h2 -->
+    <section id="products" class="section" aria-label="Grocery products">
         <div class="section-header reveal">
             <div>
-                <h2 class="section-title">Curated for your<br>family</h2>
-                <p class="section-subtitle">Click + to add to cart. Checkout via WhatsApp — we deliver around Retreat.</p>
+                <h2 class="section-title">Curated for your<br>family in Retreat</h2>
+                <p class="section-subtitle">500+ fresh groceries • Click + to add to cart. Checkout via WhatsApp — we deliver around Retreat, Cape Town.</p>
             </div>
             <div class="btn-group" style="align-self: start;">
-                <a href="/specials" class="btn btn-secondary">View Specials 🔥</a>
+                <a href="/specials" class="btn btn-secondary">View {{ specials_count }} Specials 🔥</a>
             </div>
         </div>
 
         <div class="search-wrap reveal">
             <span class="search-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-            <input type="text" class="search-input" placeholder="Search rice, bread, oil, drinks..." value="{{ search_query }}">
+            <input type="text" class="search-input" placeholder="Search rice, bread, oil, drinks, vegetables in Retreat..." value="{{ search_query }}" aria-label="Search groceries">
         </div>
 
-        <div class="filter-pills reveal">
+        <div class="filter-pills reveal" role="navigation" aria-label="Product categories">
             <a href="/" class="pill {% if not selected_category and not search_query %}active{% endif %}">All Products</a>
             {% for cat in all_categories %}
             <a href="/?category={{ cat }}" class="pill {% if selected_category == cat %}active{% endif %}">{{ cat }}</a>
@@ -171,55 +329,59 @@
 
         <div class="product-grid">
             {% for product in products %}
-            <div class="product-card" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.special_price if product.special else product.price }}" data-image="{{ product.image }}" data-category="{{ product.category }}">
+            <article class="product-card" id="product-{{ product.id }}" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.special_price if product.special else product.price }}" data-image="{{ product.image }}" data-category="{{ product.category }}" itemscope itemtype="https://schema.org/Product">
                 <div class="product-image-wrap">
-                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}" loading="lazy">
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }} - {{ product.category }} at Family Supermarket Retreat, Cape Town" loading="lazy" itemprop="image">
                     <span class="product-badge">{{ product.category }}</span>
                     {% if product.special %}<span class="product-badge special" style="left: auto; right: 0.9rem;">SAVE R{{ (product.price - product.special_price)|round|int }}</span>{% endif %}
                 </div>
                 <div class="product-info">
                     <div class="product-category">{{ product.unit }} • {% if product.in_stock %}In Stock{% else %}Low Stock{% endif %}</div>
-                    <h3 class="product-name">{{ product.name }}</h3>
-                    <div class="product-meta">
+                    <h3 class="product-name" itemprop="name">{{ product.name }}</h3>
+                    <meta itemprop="category" content="{{ product.category }}">
+                    <div class="product-meta" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                         <div class="product-price">
-                            {% if product.special %}<span class="price-current">R{{ product.special_price }}</span><span class="price-old">R{{ product.price }}</span>{% else %}<span class="price-current">R{{ product.price }}</span>{% endif %}
+                            {% if product.special %}<span class="price-current" itemprop="price">R{{ product.special_price }}</span><meta itemprop="priceCurrency" content="ZAR"><span class="price-old">R{{ product.price }}</span>{% else %}<span class="price-current" itemprop="price">R{{ product.price }}</span><meta itemprop="priceCurrency" content="ZAR">{% endif %}
+                            <link itemprop="availability" href="https://schema.org/InStock">
                         </div>
-                        <button class="add-btn add-to-cart" data-id="{{ product.id }}">+</button>
+                        <button class="add-btn add-to-cart" data-id="{{ product.id }}" aria-label="Add {{ product.name }} to cart">+</button>
                     </div>
                 </div>
-            </div>
+            </article>
             {% endfor %}
         </div>
     </section>
 
-    <!-- CONTACT -->
-    <section id="contact" class="contact-section reveal">
+    <!-- CONTACT - Local SEO -->
+    <section id="contact" class="contact-section reveal" aria-label="Contact Family Supermarket Retreat">
         <div class="contact-grid">
             <div class="contact-info">
-                <h2 style="font-family: 'Space Grotesk'; font-size: 2.2rem; line-height: 0.9; margin-bottom: 1rem;">Let's talk.<br>Bulk orders?<br>We got you.</h2>
-                <p style="color: #94a3b8; margin-bottom: 2.5rem;">Wholesalers welcome. Call or WhatsApp for best bulk prices.</p>
+                <h2 style="font-family: 'Space Grotesk'; font-size: 2.2rem; line-height: 0.9; margin-bottom: 1rem;">Let's talk.<br>Bulk orders?<br>We got you in Retreat.</h2>
+                <p style="color: #94a3b8; margin-bottom: 2.5rem;">Wholesalers welcome in Retreat, Cape Town. Call or WhatsApp for best bulk prices. Family service since 2018.</p>
                 <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📍</div><div><div style="font-weight: 600;">58 5th Ave, Retreat</div><div style="font-size: 0.85rem; color: #94a3b8;">Cape Town, 7965</div></div></div>
-                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📞</div><div><div style="font-weight: 600;">{{ business_phone_display }}</div><div style="font-size: 0.85rem; color: #94a3b8;">Call • WhatsApp • {{ business_whatsapp }}</div></div></div>
+                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📍</div><div><div style="font-weight: 600;">58 5th Ave, Retreat, Cape Town 7965</div><div style="font-size: 0.85rem; color: #94a3b8;">Near Retreat Station • Western Cape</div></div></div>
+                    <div style="display: flex; gap: 1rem; align-items: center;"><div style="width: 44px; height: 44px; background: rgba(255,255,255,0.08); border-radius: 10px; display: grid; place-items: center;">📞</div><div><div style="font-weight: 600;">{{ business_phone_display }} • {{ business_whatsapp }}</div><div style="font-size: 0.85rem; color: #94a3b8;">Call • WhatsApp • Mon-Sat 8am-6pm, Sun 9am-2pm</div></div></div>
                 </div>
             </div>
             <div class="contact-form-wrap">
                 <h3 style="font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 0.5rem;">Send us a message</h3>
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">Wholesalers in Retreat welcome — ask for bulk prices!</p>
                 <form method="POST">
                     <div class="form-group"><input type="text" id="username" name="username" class="form-input" placeholder=" " required><label for="username" class="form-label">Your Name</label></div>
                     <div class="form-group"><input type="email" id="email" name="email" class="form-input" placeholder=" " required><label for="email" class="form-label">Email</label></div>
-                    <div class="form-group"><textarea id="message" name="message" class="form-input" placeholder=" " rows="4" required style="resize: none; padding-top: 1.5rem;"></textarea><label for="message" class="form-label">Message</label></div>
+                    <div class="form-group"><textarea id="message" name="message" class="form-input" placeholder=" " rows="4" required style="resize: none; padding-top: 1.5rem;"></textarea><label for="message" class="form-label">Message — bulk orders, delivery in Retreat?</label></div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;"><span>Send Message ✨</span></button>
-                    {% if greeting %}<div style="margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 12px; color: #065f46;">Thanks {{ greeting }}! 🎉</div>{% endif %}
+                    {% if greeting %}<div style="margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 12px; color: #065f46;">Thanks {{ greeting }}! 🎉 We reply in 5 mins — {{ business_phone_display }}</div>{% endif %}
                 </form>
             </div>
         </div>
     </section>
+    </main>
 
-    <footer><div style="max-width: 1280px; margin: 0 auto; text-align: center; padding: 2rem;">© 2024 Family Supermarket • <a href="/admin?key=changeme" style="color: #059669;">Admin Dashboard</a> • Built with Python</div></footer>
+    <footer role="contentinfo"><div style="max-width: 1280px; margin: 0 auto; text-align: center; padding: 2rem;">© 2024 Family Supermarket & Wholesalers • 58 5th Ave, Retreat, Cape Town 7965 • <a href="/admin?key=changeme" style="color: #059669;" rel="nofollow">Admin Dashboard</a> • <a href="/sitemap.xml" style="color: #64748b;">Sitemap</a> • Built with Python • Serving Retreat since 2018</div></footer>
 
     <script>window.BUSINESS_WHATSAPP = "{{ business_whatsapp }}";</script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='cart.js') }}"></script>
-</body>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='cart.js') }}" defer></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ef5c43fdc4593a',t:'MTc5MDA1OTY2OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

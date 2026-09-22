@@ -23,7 +23,7 @@ def allowed_file(filename):
 # BUSINESS WHATSAPP - Change this to your number! FREE config
 # Format: Country code + number without 0, e.g. South Africa 079 623 2189 -> 27796232189
 # You can also set BUSINESS_WHATSAPP env var in Render
-BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27638378201")  # Default: your current
+BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27796232189")  # Default: your current
 BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "079 623 2189")  # For display
 
 DB_PATH = "inquiries.db"
@@ -780,15 +780,76 @@ def scan():
 
 @app.route("/sitemap.xml")
 def sitemap():
+    """Enhanced SEO Sitemap - FREE, dynamic, includes products & categories"""
     base = request.host_url.rstrip('/')
-    xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{base}/</loc><priority>1.0</priority></url><url><loc>{base}/specials</loc><priority>0.9</priority></url><url><loc>{base}/about</loc><priority>0.8</priority></url></urlset>'
-    return Response(xml, mimetype='application/xml')
+    products = load_products()
+    categories = sorted(set(p['category'] for p in products))
+
+    urls = [
+        (f"{base}/", "1.0", "daily"),
+        (f"{base}/specials", "0.9", "daily"),
+        (f"{base}/about", "0.8", "monthly"),
+        (f"{base}/scan", "0.5", "monthly"),
+    ]
+
+    # Add category pages
+    for cat in categories:
+        urls.append((f"{base}/?category={cat}", "0.7", "weekly"))
+
+    # Add product anchors (for SEO discovery)
+    for p in products[:20]:  # Top 20 products
+        urls.append((f"{base}/#product-{p['id']}", "0.6", "weekly"))
+
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for loc, priority, changefreq in urls:
+        xml_parts.append(
+            f"<url><loc>{loc}</loc><priority>{priority}</priority><changefreq>{changefreq}</changefreq><lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod></url>")
+    xml_parts.append('</urlset>')
+
+    return Response("\n".join(xml_parts), mimetype='application/xml')
 
 
 @app.route("/robots.txt")
 def robots():
-    return Response(f"User-agent: *\nAllow: /\nSitemap: {request.host_url.rstrip('/')}/sitemap.xml\n",
-                    mimetype='text/plain')
+    """Enhanced robots.txt - FREE SEO"""
+    base = request.host_url.rstrip('/')
+    txt = f"""User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /inquiries
+Disallow: /api/
+Disallow: /receipt/
+Allow: /static/
+
+# Sitemap
+Sitemap: {base}/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1
+
+# Host
+Host: {base}
+"""
+    return Response(txt, mimetype='text/plain')
+
+
+@app.route("/manifest.json")
+def manifest():
+    """PWA Manifest - FREE, helps SEO & installability"""
+    return jsonify({
+        "name": "Family Supermarket & Wholesalers",
+        "short_name": "Family Market",
+        "description": "Fresh groceries, wholesale prices in Retreat, Cape Town. Order via WhatsApp.",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#f8fafc",
+        "theme_color": "#059669",
+        "icons": [
+            {"src": "/static/images/rice.jpg", "sizes": "192x192", "type": "image/jpeg"},
+            {"src": "/static/images/rice.jpg", "sizes": "512x512", "type": "image/jpeg"}
+        ]
+    })
 
 
 @app.route("/health")

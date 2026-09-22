@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-ZA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Specials — Family Supermarket</title>
+    <title>Weekly Specials — Save Big | Family Supermarket Retreat, Cape Town | {{ specials|length }} Deals</title>
+    <meta name="description" content="{{ specials|length }} weekly specials at Family Supermarket Retreat, Cape Town — Save up to 30% on rice, oil, bread, vegetables. 58 5th Ave, Retreat. Limited time! Order via WhatsApp ☎ {{ business_phone_display }}.">
+    <meta name="keywords" content="specials Retreat, weekly specials Cape Town, grocery deals Retreat, cheap groceries Retreat, Family Supermarket specials">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.url_root.rstrip('/') }}/specials">
+    <meta name="theme-color" content="#d97706">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Weekly Specials — Family Supermarket Retreat | {{ specials|length }} Deals">
+    <meta property="og:description" content="{{ specials|length }} specials — Save big on essentials at 58 5th Ave, Retreat. Order via WhatsApp!">
+    <meta property="og:url" content="{{ request.url_root.rstrip('/') }}/specials">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/vegetables.jpg') }}">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d97706'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>\">
+    <link rel="manifest" href="/manifest.json">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Weekly Specials - Family Supermarket Retreat",
+      "description": "{{ specials|length }} weekly specials at Family Supermarket Retreat",
+      "url": "{{ request.url_root.rstrip('/') }}/specials",
+      "isPartOf": {"@type": "WebSite", "name": "Family Supermarket", "url": "{{ request.url_root.rstrip('/') }}/"}
+    }
+    </script>
     <style>
         .cart-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
         .cart-overlay.active { opacity: 1; pointer-events: auto; }
@@ -19,15 +42,19 @@
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <nav class="navbar" role="navigation">
         <div class="nav-container">
-            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Specials</span></div></a>
+            <a href="/" class="logo" aria-label="Family Supermarket Home"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Specials • Retreat</span></div></a>
             <div class="nav-links">
                 <a href="/" class="nav-link">Shop</a>
-                <a href="/specials" class="nav-link active">Specials</a>
+                <a href="/specials" class="nav-link active" aria-current="page">Specials <span class="nav-badge">{{ specials|length }}</span></a>
                 <a href="/about" class="nav-link">About</a>
-                <a href="/admin?key=changeme" class="nav-link">Admin</a>
-                <div class="cart-btn-wrap"><button id="cartBtn" class="btn btn-primary" style="padding: 0.6rem 1.2rem; margin-left: 0.5rem;"><span>🛒 Cart</span><span id="cartCount" class="cart-count">0</span></button></div>
+                <a href="/admin?key=changeme" class="nav-link" rel="nofollow">Admin</a>
+                <div class="cart-btn-wrap"><button id="cartBtn" class="btn btn-primary" style="padding: 0.6rem 1.2rem; margin-left: 0.5rem;" aria-label="Cart"><span>🛒 Cart</span><span id="cartCount" class="cart-count">0</span></button></div>
             </div>
         </div>
     </nav>
@@ -43,39 +70,44 @@
         </div>
     </div>
 
+    <main>
     <section class="hero" style="min-height: 60vh;">
         <div class="hero-bg"><div class="hero-blob"></div><div class="hero-blob"></div></div>
         <div class="hero-content" style="grid-template-columns: 1fr; text-align: center; max-width: 700px; margin: 0 auto;">
             <div class="reveal">
-                <div style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">🔥 THIS WEEK ONLY</div>
-                <h1 style="text-align: center;">Save big on<br><span>essentials</span></h1>
-                <p style="margin: 0 auto; text-align: center;">{{ specials|length }} specials • Add to cart and checkout via WhatsApp</p>
+                <div style="display: inline-block; background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">🔥 THIS WEEK ONLY • RETREAT</div>
+                <h1 style="text-align: center;">Save big on<br><span>essentials in Retreat</span></h1>
+                <p style="margin: 0 auto; text-align: center;">{{ specials|length }} specials at 58 5th Ave, Retreat • Add to cart and checkout via WhatsApp ☎ {{ business_phone_display }} • Delivery around Retreat</p>
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="section" aria-label="Weekly specials">
         <div class="product-grid">
             {% for product in specials %}
-            <div class="product-card reveal" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.special_price }}" data-image="{{ product.image }}" style="border: 2px solid #fde68a;">
+            <article class="product-card reveal" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.special_price }}" data-image="{{ product.image }}" style="border: 2px solid #fde68a;" itemscope itemtype="https://schema.org/Product">
                 <div class="product-image-wrap">
-                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}">
-                    <span class="product-badge special">🔥 SPECIAL</span>
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }} special at Family Supermarket Retreat" loading="lazy" itemprop="image">
+                    <span class="product-badge special">🔥 SPECIAL • RETREAT</span>
                 </div>
                 <div class="product-info">
-                    <div class="product-category">SAVE R{{ (product.price - product.special_price)|round|int }} • Limited</div>
-                    <h3 class="product-name">{{ product.name }}</h3>
-                    <div class="product-meta">
-                        <div class="product-price"><span class="price-current" style="color: #d97706;">R{{ product.special_price }}</span><span class="price-old">R{{ product.price }}</span><span class="price-save">-{{ ((1 - product.special_price/product.price)*100)|round|int }}%</span></div>
-                        <button class="add-btn add-to-cart" data-id="{{ product.id }}">+</button>
+                    <div class="product-category">SAVE R{{ (product.price - product.special_price)|round|int }} • Limited • Retreat</div>
+                    <h3 class="product-name" itemprop="name">{{ product.name }}</h3>
+                    <div class="product-meta" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <div class="product-price"><span class="price-current" style="color: #d97706;" itemprop="price">R{{ product.special_price }}</span><meta itemprop="priceCurrency" content="ZAR"><span class="price-old">R{{ product.price }}</span><span class="price-save">-{{ ((1 - product.special_price/product.price)*100)|round|int }}%</span></div>
+                        <button class="add-btn add-to-cart" data-id="{{ product.id }}" aria-label="Add {{ product.name }} special to cart">+</button>
                     </div>
                 </div>
-            </div>
+            </article>
             {% endfor %}
         </div>
     </section>
+    </main>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='cart.js') }}"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e9a6c98ef3c479',t:'MTc4OTk5OTgwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <footer style="text-align: center; padding: 2rem; color: #64748b;"><a href="/">← Back to Shop</a> • <a href="/sitemap.xml">Sitemap</a> • 58 5th Ave, Retreat • {{ business_phone_display }}</footer>
+
+    <script>window.BUSINESS_WHATSAPP="{{ business_whatsapp }}";</script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='cart.js') }}" defer></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ef5dcedddb593a',t:'MTc5MDA1OTczMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

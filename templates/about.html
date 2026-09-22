@@ -1,52 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-ZA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About — Family Supermarket</title>
+    <title>About Us — Family Owned Since 2018 | Family Supermarket Retreat, Cape Town</title>
+    <meta name="description" content="Family Supermarket & Wholesalers — Family owned since 2018 at 58 5th Ave, Retreat, Cape Town. Fresh daily, wholesale prices, family service. Serving Retreat, Steenberg, Lavender Hill. ☎ {{ business_phone_display }}.">
+    <meta name="keywords" content="Family Supermarket story, about Retreat supermarket, family owned Retreat, history Retreat supermarket, 58 5th Ave Retreat">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.url_root.rstrip('/') }}/about">
+    <meta name="theme-color" content="#059669">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="About Family Supermarket — Family Owned Since 2018, Retreat">
+    <meta property="og:description" content="Family owned supermarket in Retreat since 2018. Fresh daily, wholesale prices, family service. 58 5th Ave, Retreat, Cape Town.">
+    <meta property="og:url" content="{{ request.url_root.rstrip('/') }}/about">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/rice.jpg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>\">
+    <link rel="manifest" href="/manifest.json">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "About Family Supermarket Retreat",
+      "description": "Family owned supermarket in Retreat since 2018",
+      "url": "{{ request.url_root.rstrip('/') }}/about",
+      "mainEntity": {
+        "@type": "GroceryStore",
+        "name": "Family Supermarket & Wholesalers",
+        "foundingDate": "2018",
+        "address": {"@type": "PostalAddress", "streetAddress": "58 5th Ave", "addressLocality": "Retreat", "addressRegion": "Western Cape", "postalCode": "7965", "addressCountry": "ZA"}
+      }
+    }
+    </script>
 </head>
 <body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Our Story</span></div></a>
+            <a href="/" class="logo" aria-label="Home"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Our Story • Retreat</span></div></a>
             <div class="nav-links">
                 <a href="/" class="nav-link">Shop</a>
                 <a href="/specials" class="nav-link">Specials</a>
-                <a href="/about" class="nav-link active">About</a>
+                <a href="/about" class="nav-link active" aria-current="page">About</a>
             </div>
         </div>
     </nav>
 
+    <main>
     <section class="section" style="padding-top: 8rem;">
         <div style="max-width: 800px; margin: 0 auto;">
-            <h1 class="section-title reveal" style="font-size: 3.5rem; margin-bottom: 2rem;">Family owned.<br>Community loved.<br><span style="background: linear-gradient(135deg, #059669, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Since 2018.</span></h1>
+            <h1 class="section-title reveal" style="font-size: 3.5rem; margin-bottom: 2rem;">Family owned.<br>Community loved in Retreat.<br><span style="background: linear-gradient(135deg, #059669, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Since 2018.</span></h1>
 
             <div class="reveal" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: var(--shadow-md); margin: 2.5rem 0; border: 1px solid #e2e8f0;">
-                <p style="font-size: 1.15rem; line-height: 1.7; color: #334155;">Family Supermarket & Wholesalers started with one simple idea: <strong>Retreat deserves a supermarket that treats you like family, with wholesale prices everyone can afford.</strong></p>
+                <p style="font-size: 1.15rem; line-height: 1.7; color: #334155;">Family Supermarket & Wholesalers started with one simple idea at <strong>58 5th Ave, Retreat</strong>: <strong>Retreat deserves a supermarket that treats you like family, with wholesale prices everyone can afford.</strong></p>
                 <br>
-                <p style="line-height: 1.7; color: #64748b;">Located at 58 5th Ave, we've grown from a small corner shop to Retreat's go-to for fresh produce, groceries, and bulk deals. No fancy corporate tricks — just honest prices, fresh stock daily, and service that remembers your name.</p>
+                <p style="line-height: 1.7; color: #64748b;">Located at 58 5th Ave, Retreat, Cape Town 7965, we've grown from a small corner shop to Retreat's go-to for fresh produce, groceries, and bulk deals. No fancy corporate tricks — just honest prices, fresh stock daily, and service that remembers your name. Serving Retreat, Steenberg, Lavender Hill, and surrounds.</p>
+                <br>
+                <p style="line-height: 1.7; color: #64748b;"><strong>Hours:</strong> Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm • <strong>Phone:</strong> {{ business_phone_display }} • <strong>WhatsApp:</strong> {{ business_whatsapp }} • <strong>Address:</strong> 58 5th Ave, Retreat, Cape Town 7965</p>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0;" class="reveal">
                 <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">🥬</div>
                     <div style="font-weight: 600;">Fresh Daily</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">Produce from local farms</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">Produce from local farms • Retreat</div>
                 </div>
                 <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
                     <div style="font-weight: 600;">Wholesale Prices</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">Bulk = More savings</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">Bulk = More savings • 58 5th Ave</div>
                 </div>
                 <div style="background: white; padding: 1.5rem; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">❤️</div>
                     <div style="font-weight: 600;">Family Service</div>
-                    <div style="font-size: 0.85rem; color: #64748b;">We know our customers</div>
+                    <div style="font-size: 0.85rem; color: #64748b;">We know Retreat customers</div>
                 </div>
+            </div>
+
+            <div class="reveal" style="margin-top: 3rem; padding: 2rem; background: #f0fdf4; border-radius: 16px; border: 1px solid #bbf7d0;">
+                <h3 style="font-family: 'Space Grotesk'; margin-bottom: 1rem;">Find us in Retreat</h3>
+                <p style="color: #065f46; line-height: 1.6;">📍 58 5th Ave, Retreat, Cape Town 7965, Western Cape, South Africa<br>📞 {{ business_phone_display }} • 💬 WhatsApp: {{ business_whatsapp }}<br>🕒 Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm<br><br><a href="/" class="btn btn-primary"><span>Shop Now in Retreat →</span></a></p>
             </div>
         </div>
     </section>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: #64748b;">© 2024 Family Supermarket • 58 5th Ave, Retreat • <a href="/sitemap.xml">Sitemap</a></footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ef5d16bd19593a',t:'MTc5MDA1OTcwMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
