@@ -389,7 +389,7 @@
                             <link itemprop="availability" href="https://schema.org/InStock">
                         </div>
                         <div style="display: flex; gap: 0.4rem;">
-                            <button class="btn btn-secondary" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; border-radius: 9999px;" onclick="window.startAR && window.startAR({id: {{ product.id }}, name: '{{ product.name|replace(\"'\", \"\\'\") }}', price: {{ product.special_price if product.special else product.price }}, image: '{{ product.image }}', category: '{{ product.category }}'})" title="AR Preview - FREE">📱 AR</button>
+                            <button class="btn btn-secondary" style="padding: 0.4rem 0.7rem; font-size: 0.75rem; border-radius: 9999px;" onclick="window.startAR && window.startAR({id: {{ product.id }}, name: {{ product.name|tojson }}, price: {{ product.special_price if product.special else product.price }}, image: {{ product.image|tojson }}, category: {{ product.category|tojson }})" title="AR Preview - FREE">📱 AR</button>
                             <button class="add-btn add-to-cart" data-id="{{ product.id }}" aria-label="Add {{ product.name }} to cart">+</button>
                         </div>
                     </div>
@@ -660,7 +660,7 @@
             if (suggestions && suggestions.length) {
                 const sugContainer = document.getElementById('chatSuggestions');
                 if (sugContainer) {
-                    sugContainer.innerHTML = suggestions.slice(0,4).map(s => `<button class="pill" onclick="sendChat('${s.replace(/'/g, "\\'")}')" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">${s}</button>`).join('');
+                    sugContainer.innerHTML = suggestions.slice(0,4).map(s => `<button class="pill" onclick="sendChat('${s.replace(/'/g, "")}')" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">${s}</button>`).join('');
                 }
             }
         };
@@ -725,7 +725,7 @@
                 <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.9rem; display: flex; gap: 0.75rem; align-items: center;">
                     <img src="/static/images/${p.image}" style="width: 44px; height: 44px; border-radius: 8px; object-fit: cover;" onerror="this.style.display='none'">
                     <div style="flex: 1;"><div style="font-weight: 600; font-size: 0.9rem;">${p.name}</div><div style="font-size: 0.8rem; color: #64748b;">R${(p.special_price || p.price)} • ${p.category} • ${p.special ? '🔥 Special' : '58 5th Ave'}</div></div>
-                    <button class="add-btn add-to-cart" data-id="${p.id}" style="width: 32px; height: 32px;" onclick="addToCartFromAI({id: ${p.id}, name: '${p.name.replace(/'/g, "\\'")}', price: ${p.special_price || p.price}, image: '${p.image}'})">+</button>
+                    <button class="add-btn add-to-cart" data-id="${p.id}" style="width: 32px; height: 32px;" onclick="addToCartFromAI({id: ${p.id}, name: '${p.name.replace(/'/g, "")}', price: ${p.special_price || p.price}, image: '${p.image}'})">+</button>
                 </div>
             `).join('');
         }
@@ -858,8 +858,8 @@
                                     <div style="font-size: 0.8rem; color: #64748b;">R${(p.special_price || p.price)} • ${p.category} • ${p.special ? '🔥 Special' : '58 5th Ave Retreat'}</div>
                                 </div>
                                 <div style="display: flex; gap: 0.3rem;">
-                                    <button class="btn btn-secondary" style="padding: 0.4rem 0.6rem; font-size: 0.7rem;" onclick="window.startAR && window.startAR({id: ${p.id}, name: '${p.name.replace(/'/g, "\\'")}', price: ${p.special_price || p.price}, image: '${p.image}', category: '${p.category}'})">📱 AR</button>
-                                    <button class="add-btn" style="width: 32px; height: 32px;" onclick="window.addToCartFromAI && window.addToCartFromAI({id: ${p.id}, name: '${p.name.replace(/'/g, "\\'")}', price: ${p.special_price || p.price}, image: '${p.image}'})">+</button>
+                                    <button class="btn btn-secondary" style="padding: 0.4rem 0.6rem; font-size: 0.7rem;" onclick="window.startAR && window.startAR({id: ${p.id}, name: '${p.name.replace(/'/g, "")}', price: ${p.special_price || p.price}, image: '${p.image}', category: '${p.category}'})">📱 AR</button>
+                                    <button class="add-btn" style="width: 32px; height: 32px;" onclick="window.addToCartFromAI && window.addToCartFromAI({id: ${p.id}, name: '${p.name.replace(/'/g, "")}', price: ${p.special_price || p.price}, image: '${p.image}'})">+</button>
                                 </div>
                             </div>
                         `).join('');
