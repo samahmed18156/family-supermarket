@@ -195,4 +195,73 @@ document.querySelectorAll('.add-btn').forEach(btn => {
   });
 });
 
+// ===== LUXURY POLISH LAYER v2.5 - Progress + Custom Cursor =====
+// Progress bar
+const progressBar = document.getElementById('progressBar');
+if (progressBar) {
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.pageYOffset;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+  }, { passive: true });
+}
+
+// Custom cursor - luxury dot + ring (desktop only, respects reduced motion)
+const cursorDot = document.getElementById('cursorDot');
+const cursorRing = document.getElementById('cursorRing');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+if (cursorDot && cursorRing && !prefersReducedMotion && !isTouch && window.innerWidth > 900) {
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.body.classList.add('cursor-active');
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    cursorDot.style.left = mouseX + 'px';
+    cursorDot.style.top = mouseY + 'px';
+  }, { passive: true });
+
+  // Smooth ring follow with RAF
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+
+    cursorRing.style.left = ringX + 'px';
+    cursorRing.style.top = ringY + 'px';
+
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover states
+  const hoverElements = document.querySelectorAll('a, button, .product-card, .pill, .add-btn');
+  hoverElements.forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // Hide cursor when leaving window
+  document.addEventListener('mouseleave', () => {
+    cursorDot.style.opacity = '0';
+    cursorRing.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    cursorDot.style.opacity = '1';
+    cursorRing.style.opacity = '1';
+  });
+}
+
+// Luxury reveal for hero-content line
+const heroContent = document.querySelector('.hero-content');
+if (heroContent) {
+  setTimeout(() => heroContent.classList.add('revealed'), 600);
+}
+
 console.log('✨ Family Supermarket Modern UI Loaded - Smooth & Fast');
+console.log('💎 Luxury Polish v2.5 - Progress + Cursor + Gold accents - 1027 lines, 26K');
