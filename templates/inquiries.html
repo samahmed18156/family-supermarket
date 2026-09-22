@@ -36,10 +36,10 @@
                         <h3 style="font-family: 'Space Grotesk';">{{ inq['name'] }}</h3>
                         <span style="font-size: 0.8rem; color: #94a3b8; background: #f1f5f9; padding: 0.25rem 0.6rem; border-radius: 9999px;">{{ inq['created_at'] }}</span>
                     </div>
-                    <p style="margin-bottom: 0.5rem;"><a href="/cdn-cgi/l/email-protection#077c7c276e69765c20626a666e6b205a277a7a" style="color: #059669; font-weight: 500;">{{ inq['email'] }}</a> • Business WA: {{ business_phone_display }}</p>
+                    <p style="margin-bottom: 0.5rem;"><a href="mailto:{{ inq['email'] }}" style="color: #059669; font-weight: 500;">{{ inq['email'] }}</a> • Business WA: {{ business_phone_display }}</p>
                     <div style="background: #f8fafc; padding: 1rem; border-radius: 10px; margin-top: 0.75rem; white-space: pre-wrap; line-height: 1.6;">{{ inq['message'] }}</div>
                     <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                        <a href="/cdn-cgi/l/email-protection#f48f8fd49d9a85afd39199959d98d3a9d48989" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Reply via Email</a>
+                        <a href="mailto:{{ inq['email'] }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Reply via Email</a>
                         <a href="https://wa.me/{{ business_whatsapp }}?text=Hi%20{{ inq['name'] }}!%20Thanks%20for%20your%20message%20about%20{{ inq['message'][:30] }}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><span>Reply on WhatsApp</span></a>
                     </div>
                 </div>
@@ -53,6 +53,6 @@
         {% endif %}
     </main>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{ url_for('static', filename='script.js') }}"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ea4b790e85152c',t:'MTc5MDAwNjU1Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 </html>

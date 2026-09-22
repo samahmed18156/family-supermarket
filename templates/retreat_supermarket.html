@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- TARGET KEYWORD: Retreat supermarket - Beat Shoprite/Pick n Pay -->
+    <title>Retreat Supermarket — Family Supermarket & Wholesalers | Best Grocery Store in Retreat, Cape Town</title>
+    <meta name="description" content="Best Retreat supermarket — Family Supermarket & Wholesalers at 58 5th Ave, Retreat, Cape Town 7965. Fresh groceries, wholesale prices, 500+ products, {{ specials|length }} weekly specials. Open 8am-6pm. Call {{ business_phone_display }}. Cheaper than Shoprite Retreat, Pick n Pay Local. Delivery around Retreat.">
+    <meta name="keywords" content="Retreat supermarket, supermarket Retreat, best supermarket Retreat, Retreat grocery store, grocery store Retreat, Retreat Cape Town supermarket, Shoprite Retreat alternative, Pick n Pay Retreat, Hyperette Retreat, 5th Ave Retreat supermarket, cheap groceries Retreat, wholesale Retreat, Retreat wholesalers">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ request.url_root.rstrip('/') }}/retreat-supermarket">
+    <meta name="theme-color" content="#059669">
+    
+    <!-- OG for Retreat supermarket -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Retreat Supermarket — Family Supermarket & Wholesalers | Best in Retreat">
+    <meta property="og:description" content="Best Retreat supermarket at 58 5th Ave. Fresh groceries, wholesale prices, 500+ products. Cheaper than Shoprite & Pick n Pay. Call {{ business_phone_display }}.">
+    <meta property="og:url" content="{{ request.url_root.rstrip('/') }}/retreat-supermarket">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/vegetables.jpg') }}">
+    <meta property="og:locale" content="en_ZA">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- GEO -->
+    <meta name="geo.region" content="ZA-WC">
+    <meta name="geo.placename" content="Retreat, Cape Town">
+    <meta name="geo.position" content="-34.0552;18.4764">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'><path d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.6l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03L21 6H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7.42c-.14 0-.25-.11-.22-.24z'/></svg>\">
+    <link rel="manifest" href="/manifest.json">
+    {% if google_verification %}<meta name="google-site-verification" content="{{ google_verification }}">{% endif %}
+    
+    <!-- JSON-LD - GroceryStore + FAQ for AI Overview -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "GroceryStore",
+      "name": "Family Supermarket & Wholesalers - Retreat Supermarket",
+      "alternateName": ["Retreat Supermarket", "Family Supermarket Retreat", "Best Supermarket in Retreat"],
+      "description": "Best Retreat supermarket - Family Supermarket & Wholesalers at 58 5th Ave, Retreat, Cape Town. Fresh groceries, wholesale prices, cheaper than Shoprite Retreat and Pick n Pay Local. Family owned since 2018.",
+      "url": "{{ request.url_root.rstrip('/') }}/retreat-supermarket",
+      "telephone": "+{{ business_whatsapp }}",
+      "priceRange": "R",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "58 5th Ave",
+        "addressLocality": "Retreat",
+        "addressRegion": "Western Cape",
+        "postalCode": "7965",
+        "addressCountry": "ZA"
+      },
+      "geo": {"@type": "GeoCoordinates", "latitude": -34.0552, "longitude": 18.4764},
+      "openingHoursSpecification": [
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "17:00"},
+        {"@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "14:00"}
+      ],
+      "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.3", "reviewCount": "11"}
+    }
+    </script>
+    
+    <!-- FAQ SCHEMA - TARGET AI OVERVIEW -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the best supermarket in Retreat, Cape Town?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Family Supermarket & Wholesalers at 58 5th Ave, Retreat is rated the best supermarket in Retreat, Cape Town. Family-owned since 2018, offering fresh groceries, wholesale prices, 500+ products, and family service. Cheaper than Shoprite Retreat and Pick n Pay Local. Open 8am-6pm Mon-Fri, 8am-5pm Sat, 9am-2pm Sun. Call {{ business_phone_display }}."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is Family Supermarket in Retreat?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Family Supermarket & Wholesalers is located at 58 5th Ave, Retreat, Cape Town 7965, Western Cape, South Africa. Near Retreat Station, easily accessible from Steenberg, Lavender Hill, and Tokai. Coordinates: -34.0552, 18.4764. Call {{ business_phone_display }} or WhatsApp +{{ business_whatsapp }}."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the hours for Retreat supermarket?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Family Supermarket Retreat hours: Monday-Friday 8am-6pm, Saturday 8am-5pm, Sunday 9am-2pm. Located at 58 5th Ave, Retreat, Cape Town. Open now: {{ store_status.message }}. Call {{ business_phone_display }} for bulk orders."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Family Supermarket Retreat offer delivery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Family Supermarket Retreat offers delivery around Retreat, Steenberg, Lavender Hill, and nearby areas. Add to cart on our website and checkout via WhatsApp at {{ business_phone_display }}. We reply in 5 minutes. Wholesale prices for bulk orders. 58 5th Ave, Retreat."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Family Supermarket compare to Shoprite Retreat and Pick n Pay Local?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Family Supermarket & Wholesalers in Retreat offers cheaper wholesale prices than Shoprite Retreat and Pick n Pay Local, with family service that remembers your name. While Shoprite Retreat is a chain with standard selection and Pick n Pay Local is convenient for quick runs, Family Supermarket provides fresh daily produce from local farms, bulk discounts, and personalized service since 2018 at 58 5th Ave, Retreat. Call {{ business_phone_display }} for best prices."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What products does Retreat supermarket sell?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Family Supermarket Retreat sells 500+ products: fresh vegetables, bread, rice 10kg, sunflower oil, drinks, snacks, bakery, groceries, staples, produce. {{ specials|length }} weekly specials with up to 30% off. Wholesale prices for bulk. Located at 58 5th Ave, Retreat, Cape Town. Call {{ business_phone_display }}."
+          }
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo"><div class="logo-icon">F</div><div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Retreat Supermarket</span></div></a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Shop</a>
+                <a href="/retreat-supermarket" class="nav-link active">Retreat Supermarket</a>
+                <a href="/specials" class="nav-link">Specials</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+    <!-- HERO - Target Retreat supermarket -->
+    <section class="hero" style="min-height: 70vh;">
+        <div class="hero-bg"><div class="hero-blob"></div><div class="hero-blob"></div><div class="hero-blob"></div></div>
+        <div class="hero-content" style="grid-template-columns: 1.2fr 0.8fr;">
+            <div class="hero-text reveal">
+                <div style="display: inline-flex; background: #f0fdf4; border: 1px solid #bbf7d0; color: #065f46; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; margin-bottom: 1.5rem;">📍 BEST RETREAT SUPERMARKET • 58 5TH AVE • SINCE 2018</div>
+                <h1>Retreat supermarket that beats <span>Shoprite & Pick n Pay</span> on price & service.</h1>
+                <p><strong>Family Supermarket & Wholesalers</strong> is Retreat's best supermarket at <strong>58 5th Ave, Retreat, Cape Town 7965</strong>. Family-owned since 2018. 500+ fresh groceries, wholesale prices, {{ specials|length }} weekly specials. <strong>Cheaper than Shoprite Retreat</strong> and Pick n Pay Local with family service that knows your name. Open {{ store_hours[today_name] }} today.</p>
+                <div class="btn-group">
+                    <a href="/#products" class="btn btn-primary"><span>Shop Retreat Supermarket →</span></a>
+                    <a href="https://wa.me/{{ business_whatsapp }}?text=Hi%20Family%20Supermarket%20Retreat!%20I%20need%20groceries" class="btn btn-secondary" target="_blank">WhatsApp {{ business_phone_display }} →</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat"><span class="stat-number">4.3★</span><span class="stat-label">Best in Retreat</span></div>
+                    <div class="stat"><span class="stat-number">500+</span><span class="stat-label">Products</span></div>
+                    <div class="stat"><span class="stat-number">{{ business_phone_display }}</span><span class="stat-label">Call Now</span></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div style="background: white; border-radius: 24px; padding: 1.5rem; box-shadow: var(--shadow-xl); border: 1px solid #e2e8f0;">
+                    <h3 style="font-family: 'Space Grotesk'; margin-bottom: 1rem;">📍 Find Retreat Supermarket</h3>
+                    <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; font-size: 0.9rem; line-height: 1.6;">
+                        <strong>Family Supermarket & Wholesalers</strong><br>
+                        58 5th Ave, Retreat<br>
+                        Cape Town 7965, Western Cape<br>
+                        South Africa<br><br>
+                        <strong>📞 {{ business_phone_display }}</strong><br>
+                        <strong>💬 WhatsApp:</strong> +{{ business_whatsapp }}<br>
+                        <strong>🕒 Today:</strong> {{ store_hours[today_name] }}<br>
+                        <strong>📍 Coords:</strong> -34.0552, 18.4764<br><br>
+                        <em>Near Retreat Station, Steenberg, Lavender Hill</em>
+                    </div>
+                    <!-- OpenStreetMap Embed FREE -->
+                    <div style="margin-top: 1rem; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
+                        <iframe width="100%" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=18.4664%2C-34.0652%2C18.4864%2C-34.0452&amp;layer=mapnik&amp;marker=-34.0552%2C18.4764" style="border: 0;"></iframe>
+                    </div>
+                    <a href="https://www.openstreetmap.org/?mlat=-34.0552&mlon=18.4764#map=16/-34.0552/18.4764" target="_blank" style="font-size: 0.8rem; color: #059669; display: block; text-align: center; margin-top: 0.5rem;">View Larger Map → OpenStreetMap</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPARISON - Beat Shoprite -->
+    <section class="section" style="background: white; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <h2 style="font-family: 'Space Grotesk'; font-size: 2.5rem; text-align: center; margin-bottom: 1rem; letter-spacing: -0.03em;">Why Family Supermarket is the best Retreat supermarket</h2>
+            <p style="text-align: center; color: #64748b; max-width: 600px; margin: 0 auto 2.5rem;">Compare us to Shoprite Retreat, Pick n Pay Local, and Hyperette Supermarket — family service wins</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 16px; padding: 1.5rem;">
+                    <div style="font-size: 2rem; margin-bottom: 0.75rem;">🏪 Family Supermarket</div>
+                    <h3 style="font-weight: 700; margin-bottom: 0.75rem; color: #065f46;">Family Supermarket & Wholesalers</h3>
+                    <ul style="font-size: 0.9rem; line-height: 1.7; color: #334155; list-style: none; padding: 0;">
+                        <li>✅ Family-owned since 2018 — knows your name</li>
+                        <li>✅ Wholesale prices — cheaper than chains</li>
+                        <li>✅ 500+ products, fresh daily from local farms</li>
+                        <li>✅ {{ specials|length }} weekly specials, up to 30% off</li>
+                        <li>✅ WhatsApp order: {{ business_phone_display }}</li>
+                        <li>✅ Delivery around Retreat, Steenberg</li>
+                        <li>✅ 58 5th Ave, Retreat — easy parking</li>
+                    </ul>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; opacity: 0.8;">
+                    <div style="font-size: 2rem; margin-bottom: 0.75rem;">🏢 Shoprite Retreat</div>
+                    <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Shoprite Retreat</h3>
+                    <ul style="font-size: 0.9rem; line-height: 1.7; color: #64748b; list-style: none; padding: 0;">
+                        <li>❌ Chain supermarket — standard selection</li>
+                        <li>❌ In-store bakery and deli (crowded)</li>
+                        <li>❌ Corporate, not family service</li>
+                        <li>❌ No WhatsApp ordering</li>
+                        <li>⚠️ Long queues, no personal touch</li>
+                    </ul>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; opacity: 0.8;">
+                    <div style="font-size: 2rem; margin-bottom: 0.75rem;">🛒 Pick n Pay Local</div>
+                    <h3 style="font-weight: 600; margin-bottom: 0.75rem;">Pick n Pay Local</h3>
+                    <ul style="font-size: 0.9rem; line-height: 1.7; color: #64748b; list-style: none; padding: 0;">
+                        <li>❌ Convenient neighborhood option</li>
+                        <li>❌ Quick everyday runs only</li>
+                        <li>❌ Promotional sales — limited range</li>
+                        <li>❌ Not wholesale, not bulk</li>
+                        <li>⚠️ Small, not full supermarket</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTS - Retreat supermarket products -->
+    <section class="section">
+        <h2 class="section-title">Fresh groceries at Retreat supermarket</h2>
+        <p class="section-subtitle">500+ products at 58 5th Ave, Retreat — wholesale prices, cheaper than Shoprite Retreat</p>
+        <div class="product-grid">
+            {% for product in products %}
+            <article class="product-card" data-id="{{ product.id }}">
+                <div class="product-image-wrap">
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }} at Retreat supermarket Family Supermarket 58 5th Ave" loading="lazy">
+                    <span class="product-badge">Retreat</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">{{ product.category }} • 58 5th Ave</div>
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <div class="product-meta">
+                        <div class="product-price"><span class="price-current">R{{ product.special_price if product.special else product.price }}</span></div>
+                        <span style="font-size: 0.8rem; color: #059669; font-weight: 600;">{{ business_phone_display }}</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: 2.5rem;">
+            <a href="/" class="btn btn-primary"><span>Shop All 500+ Products at Retreat Supermarket →</span></a>
+        </div>
+    </section>
+
+    <!-- FAQ - For AI Overview -->
+    <section class="section" style="background: #f8fafc; border-radius: 24px; margin: 2rem auto; max-width: 900px;">
+        <h2 style="font-family: 'Space Grotesk'; font-size: 2.2rem; margin-bottom: 2rem; text-align: center;">Retreat Supermarket FAQ — Family Supermarket</h2>
+        <div style="display: grid; gap: 1rem;">
+            <details style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem;" open>
+                <summary style="font-weight: 600; cursor: pointer; font-size: 1.05rem;">What is the best supermarket in Retreat, Cape Town?</summary>
+                <p style="margin-top: 0.75rem; color: #475569; line-height: 1.6;">Family Supermarket & Wholesalers at 58 5th Ave, Retreat is the best supermarket in Retreat, Cape Town. Family-owned since 2018, 500+ products, wholesale prices cheaper than Shoprite Retreat and Pick n Pay Local. Call {{ business_phone_display }}. Open {{ store_hours[today_name] }} today.</p>
+            </details>
+            <details style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem;">
+                <summary style="font-weight: 600; cursor: pointer;">Where is Family Supermarket in Retreat?</summary>
+                <p style="margin-top: 0.75rem; color: #475569; line-height: 1.6;">58 5th Ave, Retreat, Cape Town 7965, Western Cape, South Africa. Near Retreat Station, Steenberg, Lavender Hill. Coordinates -34.0552, 18.4764. Phone {{ business_phone_display }}, WhatsApp +{{ business_whatsapp }}.</p>
+            </details>
+            <details style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem;">
+                <summary style="font-weight: 600; cursor: pointer;">What are hours for Retreat supermarket?</summary>
+                <p style="margin-top: 0.75rem; color: #475569; line-height: 1.6;">Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm. Today: {{ store_hours[today_name] }}. Status: {{ store_status.message }}. 58 5th Ave, Retreat. Call {{ business_phone_display }}.</p>
+            </details>
+            <details style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem;">
+                <summary style="font-weight: 600; cursor: pointer;">Does Retreat supermarket offer delivery?</summary>
+                <p style="margin-top: 0.75rem; color: #475569; line-height: 1.6;">Yes! Delivery around Retreat, Steenberg, Lavender Hill. WhatsApp {{ business_phone_display }} or +{{ business_whatsapp }}. Add to cart, checkout via WhatsApp, we reply in 5 mins. Wholesale prices for bulk.</p>
+            </details>
+            <details style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem;">
+                <summary style="font-weight: 600; cursor: pointer;">How does Family Supermarket compare to Shoprite Retreat?</summary>
+                <p style="margin-top: 0.75rem; color: #475569; line-height: 1.6;">Family Supermarket offers cheaper wholesale prices than Shoprite Retreat chain, with family service that knows your name. Shoprite has standard chain selection, bakery, deli. Family Supermarket has fresh daily from local farms, bulk discounts, WhatsApp ordering at {{ business_phone_display }}, personal service since 2018.</p>
+            </details>
+        </div>
+    </section>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: #64748b; border-top: 1px solid #e2e8f0;">
+        <strong>Retreat Supermarket — Family Supermarket & Wholesalers</strong><br>
+        58 5th Ave, Retreat, Cape Town 7965 • {{ business_phone_display }} • +{{ business_whatsapp }}<br>
+        Best supermarket in Retreat, cheaper than Shoprite Retreat & Pick n Pay Local • <a href="/sitemap.xml">Sitemap</a> • <a href="/">Shop</a>
+    </footer>
+
+    <script>window.BUSINESS_WHATSAPP="{{ business_whatsapp }}";</script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='cart.js') }}" defer></script>
+</body>
+</html>

@@ -21,10 +21,11 @@ def allowed_file(filename):
 
 
 # BUSINESS WHATSAPP - Change this to your number! FREE config
-# Format: Country code + number without 0, e.g. South Africa 079 623 2189 -> 27796232189
+# Format: Country code + number without 0, e.g. South Africa 063 837 8201 -> 27638378201
 # You can also set BUSINESS_WHATSAPP env var in Render
-BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27796232189")  # Default: your current
-BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "079 623 2189")  # For display
+BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27638378201")  # NEW: 063 837 8201
+BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "063 837 8201")  # For display
+GOOGLE_VERIFICATION = os.getenv("GOOGLE_VERIFICATION", "")  # For Search Console
 
 DB_PATH = "inquiries.db"
 PRODUCTS_FILE = Path("products.json")
@@ -249,7 +250,9 @@ def inject_globals():
         "all_categories": sorted(set(p['category'] for p in load_products())),
         "specials_count": len([p for p in load_products() if p.get('special')]),
         "business_whatsapp": BUSINESS_WHATSAPP,
-        "business_phone_display": BUSINESS_PHONE_DISPLAY
+        "business_phone_display": BUSINESS_PHONE_DISPLAY,
+        "google_verification": GOOGLE_VERIFICATION,
+        "current_year": now.year
     }
 
 
@@ -668,12 +671,12 @@ def api_broadcast():
     customers = cur.fetchall()
     conn.close()
 
-    broadcast_text = f"🔥 WEEKLY SPECIALS - Family Supermarket!\n\n"
+    broadcast_text = f"🔥 WEEKLY SPECIALS - Family Supermarket Retreat!\n\n"
     for p in specials[:5]:
         price = p.get('special_price', p['price'])
         broadcast_text += f"• {p['name']} - R{price} (was R{p['price']})\n"
 
-    broadcast_text += f"\n📍 58 5th Ave, Retreat\n🛒 Order: {request.host_url}\n📞 079 623 2189"
+    broadcast_text += f"\n📍 58 5th Ave, Retreat, Cape Town 7965\n🛒 Order: {request.host_url}\n📞 {BUSINESS_PHONE_DISPLAY} • WhatsApp: https://wa.me/{BUSINESS_WHATSAPP}"
 
     return jsonify({
         "specials_count": len(specials),
@@ -784,29 +787,29 @@ def sitemap():
     base = request.host_url.rstrip('/')
     products = load_products()
     categories = sorted(set(p['category'] for p in products))
-
+    
     urls = [
         (f"{base}/", "1.0", "daily"),
+        (f"{base}/retreat-supermarket", "1.0", "daily"),  # Target keyword
+        (f"{base}/supermarket-near-me", "0.95", "daily"),
         (f"{base}/specials", "0.9", "daily"),
         (f"{base}/about", "0.8", "monthly"),
         (f"{base}/scan", "0.5", "monthly"),
     ]
-
+    
     # Add category pages
     for cat in categories:
         urls.append((f"{base}/?category={cat}", "0.7", "weekly"))
-
+    
     # Add product anchors (for SEO discovery)
     for p in products[:20]:  # Top 20 products
         urls.append((f"{base}/#product-{p['id']}", "0.6", "weekly"))
-
-    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>',
-                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for loc, priority, changefreq in urls:
-        xml_parts.append(
-            f"<url><loc>{loc}</loc><priority>{priority}</priority><changefreq>{changefreq}</changefreq><lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod></url>")
+        xml_parts.append(f"<url><loc>{loc}</loc><priority>{priority}</priority><changefreq>{changefreq}</changefreq><lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod></url>")
     xml_parts.append('</urlset>')
-
+    
     return Response("\n".join(xml_parts), mimetype='application/xml')
 
 
@@ -840,7 +843,7 @@ def manifest():
     return jsonify({
         "name": "Family Supermarket & Wholesalers",
         "short_name": "Family Market",
-        "description": "Fresh groceries, wholesale prices in Retreat, Cape Town. Order via WhatsApp.",
+        "description": f"Fresh groceries, wholesale prices in Retreat, Cape Town. Order via WhatsApp {BUSINESS_PHONE_DISPLAY}.",
         "start_url": "/",
         "display": "standalone",
         "background_color": "#f8fafc",
@@ -850,6 +853,23 @@ def manifest():
             {"src": "/static/images/rice.jpg", "sizes": "512x512", "type": "image/jpeg"}
         ]
     })
+
+
+@app.route("/retreat-supermarket")
+def retreat_supermarket():
+    """Location SEO Page - Target 'Retreat supermarket' keyword to beat Shoprite - FREE"""
+    return render_template("retreat_supermarket.html", 
+                         products=get_products()[:8],
+                         specials=get_products(specials_only=True)[:6])
+
+
+@app.route("/supermarket-near-me")
+def near_me():
+    """Near Me SEO - FREE"""
+    return render_template("retreat_supermarket.html",
+                         products=get_products()[:8],
+                         specials=get_products(specials_only=True)[:6],
+                         near_me=True)
 
 
 @app.route("/health")

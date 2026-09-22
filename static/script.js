@@ -222,7 +222,7 @@ if (cursorDot && cursorRing && !prefersReducedMotion && !isTouch && window.inner
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-
+    
     cursorDot.style.left = mouseX + 'px';
     cursorDot.style.top = mouseY + 'px';
   }, { passive: true });
@@ -231,10 +231,10 @@ if (cursorDot && cursorRing && !prefersReducedMotion && !isTouch && window.inner
   function animateRing() {
     ringX += (mouseX - ringX) * 0.15;
     ringY += (mouseY - ringY) * 0.15;
-
+    
     cursorRing.style.left = ringX + 'px';
     cursorRing.style.top = ringY + 'px';
-
+    
     requestAnimationFrame(animateRing);
   }
   animateRing();
