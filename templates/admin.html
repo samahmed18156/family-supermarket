@@ -105,6 +105,39 @@
             <div id="quickActionResult" style="margin-top: 1.25rem; display: none; background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 0.9rem; max-height: 400px; overflow-y: auto;"></div>
         </div>
 
+        <!-- ADMIN PRO - BULK IMPORT/EXPORT + PROFIT - FREE -->
+        <div class="admin-section" style="border: 2px solid #8b5cf6; background: linear-gradient(135deg, #f3e8ff, white);">
+            <h3>🛠️ Admin Pro — Bulk Import/Export + Profit Analytics <span style="font-size: 0.7rem; background: #8b5cf6; color: white; padding: 0.3rem 0.7rem; border-radius: 9999px;">CHALLENGE</span></h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Import 100 products via CSV/Excel/JSON in seconds, export for backup, see profit potential — 100% FREE, no money needed.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div style="background: white; border: 1px solid #e9d5ff; border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">📥 Bulk Import (CSV/JSON/Excel)</h4>
+                    <form id="bulkImportForm" enctype="multipart/form-data">
+                        <input type="hidden" name="key" value="{{ request.args.get('key','changeme') }}">
+                        <input type="file" name="file" accept=".csv,.json,.xlsx,.xls" required style="width: 100%; padding: 0.6rem; border: 1px dashed #c4b5fd; border-radius: 8px; margin-bottom: 0.75rem;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: #8b5cf6;"><span>📥 Import Products — FREE</span></button>
+                    </form>
+                    <div id="importStatus" style="font-size: 0.8rem; margin-top: 0.75rem; color: #64748b;"></div>
+                    <div style="margin-top: 1rem; font-size: 0.75rem; color: #94a3b8; background: #f5f3ff; padding: 0.75rem; border-radius: 8px;">
+                        <strong>CSV format:</strong> name,category,price,cost_price,stock,unit,image,special,special_price<br>
+                        <strong>Example:</strong> Milk 2L,Dairy,32,22.5,20,litre,milk.jpg,false,<br>
+                        <a href="/api/admin/bulk-export?key={{ request.args.get('key','changeme') }}&format=csv" style="color: #8b5cf6;">Download sample CSV →</a>
+                    </div>
+                </div>
+                
+                <div style="background: white; border: 1px solid #e9d5ff; border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">📤 Bulk Export + Profit</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <a href="/api/admin/bulk-export?key={{ request.args.get('key','changeme') }}&format=json" class="btn btn-secondary" style="justify-content: center; font-size: 0.85rem;">📄 Export JSON</a>
+                        <a href="/api/admin/bulk-export?key={{ request.args.get('key','changeme') }}&format=csv" class="btn btn-secondary" style="justify-content: center; font-size: 0.85rem;">📊 Export CSV</a>
+                    </div>
+                    <button onclick="loadProfit()" class="btn btn-secondary" style="width: 100%; justify-content: center; background: #dcfce7; border-color: #bbf7d0; color: #166534;"><span>💰 Profit Analytics — FREE</span></button>
+                    <div id="profitResult" style="font-size: 0.8rem; margin-top: 0.75rem; background: #f0fdf4; padding: 0.75rem; border-radius: 8px; display: none; white-space: pre-wrap;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- ADD NEW PRODUCT - YOUR IDEA! -->
         <div class="admin-section" id="add-product" style="border: 2px solid #059669; background: linear-gradient(135deg, #f0fdf4, white);">
             <h3>➕ Add New Product — With Photo, Cost, Stock <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.2rem 0.6rem; border-radius: 9999px;">NEW</span></h3>
@@ -473,6 +506,40 @@ document.querySelectorAll('.edit-full-form').forEach(form => {
         }
     });
 });
+
+// Admin Pro - Bulk Import
+document.getElementById('bulkImportForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const status = document.getElementById('importStatus');
+    status.textContent = '⏳ Importing...';
+    status.style.color = '#64748b';
+    
+    try {
+        const res = await fetch('/api/admin/bulk-import?key={{ request.args.get("key","changeme") }}', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+            status.textContent = `✅ Imported ${data.imported} products! Total: ${data.total} — Reloading...`;
+            status.style.color = '#059669';
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            status.textContent = '❌ ' + data.error;
+            status.style.color = '#ef4444';
+        }
+    } catch(err) {
+        status.textContent = '❌ ' + err.message;
+        status.style.color = '#ef4444';
+    }
+});
+
+async function loadProfit() {
+    const res = await fetch('/api/admin/profit-analytics');
+    const data = await res.json();
+    const el = document.getElementById('profitResult');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>💰 Profit Analytics — FREE</strong>\n\nTotal Products: ${data.total_products}\nStock Value: R${data.total_stock_value}\nProfit Potential: R${data.total_profit_potential}\nAvg Margin: ${data.avg_margin}%\n\nLow Margin (<20%):\n${data.low_margin_products.map(p => `• ${p.name}: ${p.margin}% (R${p.cost} → R${p.price})`).join('\n') || 'None — great margins!'}\n\n${data.whatsapp_report}`;
+}
 
 document.getElementById('refreshBtn')?.addEventListener('click', () => location.reload());
 loadAnalytics();

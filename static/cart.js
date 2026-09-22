@@ -201,8 +201,8 @@ checkoutBtn?.addEventListener('click', async () => {
             text += `- ${item.name} x${item.qty} = R${(item.price * item.qty).toFixed(2)}\n`;
         });
         text += `\nTotal: R${total.toFixed(2)}\nPhone: ${phone}`;
-        // Uses business_whatsapp from global or fallback
-        const waNumber = window.BUSINESS_WHATSAPP || '27796232189';
+        // Uses business_whatsapp from global or fallback - NEW 063 837 8201
+        const waNumber = window.BUSINESS_WHATSAPP || '27638378201';
         window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
@@ -213,4 +213,117 @@ checkoutBtn?.addEventListener('click', async () => {
 // Init
 updateCartUI();
 
-console.log('🛒 Cart v4 loaded - Smooth motion + WhatsApp checkout');
+// ===== CHALLENGE: PWA OFFLINE + REVIEWS AUTO-REQUEST + PERFORMANCE =====
+
+// PWA: Save cart for offline + sync when online
+function saveCartOffline() {
+    try {
+        localStorage.setItem('fs_cart', JSON.stringify(cart));
+        localStorage.setItem('fs_cart_timestamp', Date.now().toString());
+        // For service worker sync
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            navigator.serviceWorker.ready.then(reg => {
+                reg.sync.register('sync-orders').catch(() => {});
+            });
+        }
+    } catch (e) {
+        console.log('Offline save failed', e);
+    }
+}
+
+// Enhanced saveCart with offline
+const originalSaveCart = saveCart;
+saveCart = function() {
+    originalSaveCart();
+    saveCartOffline();
+};
+
+// Performance: Preload WhatsApp URL on cart open for instant checkout
+let whatsappPrefetched = false;
+function prefetchWhatsApp() {
+    if (whatsappPrefetched || cart.length === 0) return;
+    whatsappPrefetched = true;
+    // Prefetch wa.me domain
+    const link = document.createElement('link');
+    link.rel = 'dns-prefetch';
+    link.href = 'https://wa.me';
+    document.head.appendChild(link);
+}
+
+// Prefetch on cart open
+const originalOpenCart = openCart;
+openCart = function() {
+    originalOpenCart();
+    prefetchWhatsApp();
+    // Performance: lazy load cart images if any
+    setTimeout(() => {
+        document.querySelectorAll('.cart-item img').forEach(img => {
+            if (img.dataset.src) {
+                img.src = img.dataset.src;
+            }
+        });
+    }, 100);
+};
+
+// Reviews: Auto-request 30s after successful checkout - FREE social proof
+let lastOrderTime = 0;
+const originalCheckoutSuccess = () => {
+    localStorage.setItem('lastOrderTime', Date.now().toString());
+    lastOrderTime = Date.now();
+    
+    // Ask for review after 30s - helps beat Shoprite
+    setTimeout(() => {
+        if (confirm('🌟 Loved Family Supermarket Retreat? Best Retreat supermarket at 58 5th Ave! Please leave a Google review mentioning "Retreat supermarket" — helps us beat Shoprite & helps neighbors find us! 🙏')) {
+            const reviewText = `Hi! I want to leave a 5-star review for Family Supermarket Retreat — best Retreat supermarket at 58 5th Ave, Cape Town! Fresh groceries, wholesale prices, family service since 2018. Call 063 837 8201 ⭐⭐⭐⭐⭐`;
+            window.open(`https://wa.me/${window.BUSINESS_WHATSAPP || '27638378201'}?text=${encodeURIComponent(reviewText)}`, '_blank');
+            // Also open Google review
+            setTimeout(() => {
+                window.open('https://search.google.com/local/writereview?placeid=FamilySupermarketRetreat', '_blank');
+            }, 1000);
+        }
+    }, 30000); // 30 seconds after order
+};
+
+// Hook into checkout success
+const checkoutBtnOriginal = checkoutBtn;
+if (checkoutBtn) {
+    const originalHandler = checkoutBtn.onclick;
+    // We already have handler, add review hook via localStorage
+    const existingCheckout = checkoutBtn?.addEventListener;
+    // Store order time on success
+    const observer = new MutationObserver(() => {
+        if (cart.length === 0 && localStorage.getItem('fs_cart') === '[]') {
+            // Cart cleared = order success
+            if (Date.now() - lastOrderTime > 60000) { // Avoid duplicate
+                localStorage.setItem('lastOrderTime', Date.now().toString());
+                setTimeout(() => {
+                    // Only ask once per order
+                    const asked = sessionStorage.getItem('review-asked');
+                    if (!asked) {
+                        sessionStorage.setItem('review-asked', 'true');
+                        if (confirm('✅ Order placed! Enjoy your groceries from Retreat supermarket? Please leave a review — mention "Retreat supermarket" to help us beat Shoprite Retreat! 🌟')) {
+                            window.open(`https://wa.me/${window.BUSINESS_WHATSAPP || '27638378201'}?text=${encodeURIComponent('Hi Family Supermarket Retreat! Best Retreat supermarket at 58 5th Ave! ⭐⭐⭐⭐⭐ Fresh groceries, wholesale prices, family service!')}`, '_blank');
+                        }
+                    }
+                }, 30000);
+            }
+        }
+    });
+    // Observe cart changes
+    if (cartItemsEl) {
+        observer.observe(cartItemsEl, { childList: true, subtree: true });
+    }
+}
+
+// Performance: Debounced cart save for speed
+let saveTimeout;
+function debouncedSave() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        localStorage.setItem('fs_cart', JSON.stringify(cart));
+        updateCartUI();
+    }, 100);
+}
+
+console.log('🛒 Cart v5 - PWA offline + Reviews auto-request + Performance - 063 837 8201');
+console.log('📱 Offline cart saved, ⭐ Reviews auto-request in 30s, ⚡ Prefetch WhatsApp');

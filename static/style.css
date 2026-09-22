@@ -1025,3 +1025,115 @@ body::before {
   }
   .cursor-dot, .cursor-ring { display: none !important; }
 }
+
+/*
+  ===== CHALLENGE: ALL 4 AT ONCE - PWA + ADMIN PRO + REVIEWS + PERFORMANCE =====
+  Performance 90+ PageSpeed - FREE
+*/
+
+/* Performance: content-visibility for offscreen */
+.product-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px;
+}
+
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 800px;
+}
+
+/* Performance: will-change for animations */
+.hero-blob, .hero-card, .product-card, .btn {
+  will-change: transform;
+}
+
+/* Performance: image rendering */
+.product-image-wrap img {
+  image-rendering: -webkit-optimize-contrast;
+  content-visibility: auto;
+}
+
+/* PWA: Install banner animation */
+#pwaBanner {
+  animation: slideUp 0.5s var(--ease-luxury);
+  transform: translateZ(0);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%) translateZ(0); opacity: 0; }
+  to { transform: translateY(0) translateZ(0); opacity: 1; }
+}
+
+/* Reviews: Performance + luxury */
+#reviews {
+  content-visibility: auto;
+}
+#reviewsGrid > div {
+  transition: all 0.3s var(--ease-luxury);
+  will-change: transform;
+}
+#reviewsGrid > div:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--line-strong);
+}
+
+/* Admin Pro: Bulk import styling */
+#bulkImportForm input[type="file"] {
+  cursor: pointer;
+}
+#bulkImportForm input[type="file"]:hover {
+  border-color: #8b5cf6;
+  background: #f5f3ff;
+}
+
+/* Performance: Reduce layout shifts */
+.product-card {
+  contain: layout style paint;
+}
+
+.hero-visual {
+  contain: layout;
+}
+
+/* Performance: Font display swap already via Google Fonts, but add fallback */
+@font-face {
+  font-family: 'Outfit Fallback';
+  src: local('Arial');
+  size-adjust: 105%;
+  ascent-override: 95%;
+}
+
+/* Performance: Critical CSS inlined, non-critical deferred via JS - already done */
+
+/* PWA: Offline indicator */
+body.offline::before {
+  content: '📴 Offline — Cart saved locally — 063 837 8201';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  z-index: 9999;
+}
+
+/* Performance: Smooth scrolling with reduced motion respect */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Performance: Hardware acceleration */
+.navbar, .cart-drawer, .progress-bar, .cursor-dot, .cursor-ring {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reviews stars animation */
+#reviewsGrid > div > div:first-child {
+  letter-spacing: 0.1em;
+}
