@@ -1,4 +1,4 @@
-/* Family Supermarket - ADVANCED AI Chatbot + Voice - FREE
+/* Family Supermarket - ADVANCED AI Chatbot + Voice
    No OpenAI cost - Rule-based AI + Web Speech API
    Retreat supermarket - 063 837 8201
 */
@@ -18,7 +18,7 @@ class FamilyMarketAI {
     };
   }
 
-  // Advanced NLP - intent detection (FREE, no LLM)
+  // Advanced NLP - intent detection (, no LLM)
   detectIntent(message) {
     const msg = message.toLowerCase();
     
@@ -35,7 +35,7 @@ class FamilyMarketAI {
     return 'general';
   }
 
-  // Smart product search - fuzzy + semantic FREE
+  // Smart product search - fuzzy + semantic 
   searchProducts(query) {
     const q = query.toLowerCase();
     return this.products.filter(p => {
@@ -47,7 +47,7 @@ class FamilyMarketAI {
     }).slice(0,3);
   }
 
-  // Generate response - Advanced AI logic FREE
+  // Generate response - Advanced AI logic 
   respond(message) {
     const intent = this.detectIntent(message);
     const products = this.searchProducts(message);
@@ -105,7 +105,7 @@ class FamilyMarketAI {
   }
 }
 
-// Voice Ordering - Web Speech API FREE
+// Voice Ordering - Web Speech API 
 class VoiceOrdering {
   constructor(ai) {
     this.ai = ai;
@@ -188,7 +188,7 @@ class VoiceOrdering {
   }
 }
 
-// Smart Recommendations - ML in browser FREE
+// Smart Recommendations - ML in browser 
 class SmartRecommendations {
   constructor(products) {
     this.products = products;
@@ -245,4 +245,4 @@ window.FamilyMarketAI = FamilyMarketAI;
 window.VoiceOrdering = VoiceOrdering;
 window.SmartRecommendations = SmartRecommendations;
 
-console.log('🤖 Advanced AI Chatbot + Voice + Recommendations loaded - FREE, no OpenAI cost - 063 837 8201');
+console.log('🤖 Advanced AI Chatbot + Voice + Recommendations loaded, no OpenAI cost - 063 837 8201');

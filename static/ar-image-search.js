@@ -1,310 +1,250 @@
-/* Family Supermarket - ADVANCED AR + Image Search - FREE
-   TensorFlow.js MobileNet + WebXR + Camera - No API cost
-   Retreat supermarket - 063 837 8201
-*/
+/**
+ * Image Search + AR Preview - Family Supermarket Retreat - 063 837 8201
+ * TensorFlow.js MobileNet + WebXR
+ */
 
-// Image Search via TensorFlow.js MobileNet - FREE, browser AI
 class ImageSearchAI {
-  constructor(products) {
-    this.products = products || [];
-    this.model = null;
-    this.modelLoaded = false;
-    this.init();
-  }
-
-  async init() {
-    try {
-      // Load TensorFlow.js and MobileNet from CDN - FREE
-      if (!window.tf) {
-        await this.loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js');
-      }
-      if (!window.mobilenet) {
-        await this.loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.js');
-      }
-      
-      // Load model - FREE, runs in browser, no API
-      this.model = await window.mobilenet.load({version: 2, alpha: 1.0});
-      this.modelLoaded = true;
-      console.log('✅ TensorFlow.js MobileNet loaded - Image Search ready - FREE');
-      
-      const status = document.getElementById('imageSearchStatus');
-      if (status) status.textContent = '✅ AI Image Search ready — Upload photo of bread, rice, veggies!';
-    } catch (e) {
-      console.log('TensorFlow failed, using fallback', e);
-      this.modelLoaded = false;
-      const status = document.getElementById('imageSearchStatus');
-      if (status) status.textContent = '📸 Image Search ready — Upload photo (fallback mode)';
-    }
-  }
-
-  loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // Classify image via MobileNet - FREE
-  async classifyImage(imgElement) {
-    if (!this.modelLoaded || !this.model) {
-      return this.fallbackSearch(imgElement);
+    constructor(products) {
+        this.products = products || [];
+        this.model = null;
+        this.modelLoaded = false;
+        this.loadModel();
     }
 
-    try {
-      const predictions = await this.model.classify(imgElement, 5);
-      console.log('Image predictions:', predictions);
-      return predictions;
-    } catch (e) {
-      console.log('Classify failed', e);
-      return this.fallbackSearch(imgElement);
-    }
-  }
-
-  // Fallback search without TF - FREE
-  fallbackSearch(imgElement) {
-    // Simple fallback based on image name or random
-    const fileName = imgElement.dataset.fileName || '';
-    return [{className: fileName, probability: 0.5}];
-  }
-
-  // Map MobileNet classes to supermarket products - FREE AI logic
-  mapToProducts(predictions, fileName) {
-    const query = (predictions[0]?.className || fileName || '').toLowerCase();
-    
-    // Advanced mapping - MobileNet classes to grocery
-    const mappings = {
-      'bread': ['bread', 'bakery', 'loaf'],
-      'baguette': ['bread', 'bakery'],
-      'rice': ['rice', 'staples', 'grain'],
-      'oil': ['oil', 'bottle', 'groceries'],
-      'vegetable': ['vegetables', 'produce', 'veggie', 'broccoli', 'cabbage'],
-      'broccoli': ['vegetables', 'produce'],
-      'beverage': ['drinks', 'bottle', 'soda'],
-      'bottle': ['drinks', 'oil', 'groceries'],
-      'snack': ['snacks', 'chips', 'pack'],
-      'packet': ['snacks', 'rice', 'pack'],
-      'fruit': ['produce', 'vegetables'],
-      'food': ['groceries', 'staples', 'produce']
-    };
-
-    let matchedProducts = [];
-    const seen = new Set();
-
-    // Check predictions against mappings
-    predictions.forEach(pred => {
-      const predClass = pred.className.toLowerCase();
-      for (const [key, categories] of Object.entries(mappings)) {
-        if (predClass.includes(key) || key.includes(predClass.split(',')[0].trim())) {
-          categories.forEach(cat => {
-            this.products.filter(p => 
-              p.category.toLowerCase().includes(cat) || 
-              p.name.toLowerCase().includes(cat) ||
-              p.name.toLowerCase().includes(key)
-            ).forEach(p => {
-              if (!seen.has(p.id)) {
-                matchedProducts.push({...p, _score: pred.probability, _matched: key});
-                seen.add(p.id);
-              }
-            });
-          });
+    async loadModel() {
+        try {
+            const status = document.getElementById('imageSearchStatus');
+            if (status) status.textContent = 'Loading image recognition...';
+            
+            // Load TensorFlow.js
+            if (!window.tf) {
+                await this.loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js');
+            }
+            if (!window.mobilenet) {
+                await this.loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.js');
+            }
+            
+            this.model = await mobilenet.load();
+            this.modelLoaded = true;
+            if (status) status.textContent = 'Ready — Upload photo of bread, rice, veggies... 063 837 8201';
+            console.log('ImageSearchAI ready');
+        } catch (e) {
+            console.log('TF load failed, using server fallback', e);
+            const status = document.getElementById('imageSearchStatus');
+            if (status) status.textContent = 'Ready — Upload photo (server analysis) — 063 837 8201';
         }
-      }
-    });
+    }
 
-    // Also search by filename
-    if (fileName) {
-      const fileLower = fileName.toLowerCase();
-      this.products.forEach(p => {
-        if (!seen.has(p.id) && (fileLower.includes(p.name.toLowerCase().split(' ')[0]) || p.name.toLowerCase().includes(fileLower.split('.')[0]))) {
-          matchedProducts.push({...p, _score: 0.4, _matched: 'filename'});
-          seen.add(p.id);
+    loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    async classifyImage(imgElement) {
+        if (!this.model) return [];
+        try {
+            const predictions = await this.model.classify(imgElement);
+            return predictions;
+        } catch {
+            return [];
         }
-      });
     }
 
-    // If no matches, return popular
-    if (matchedProducts.length === 0) {
-      matchedProducts = this.products.filter(p => p.special).slice(0,3).map(p => ({...p, _score: 0.3, _matched: 'popular'}));
+    mapToProducts(predictions) {
+        const keywordMap = {
+            'bread': ['bakery', 'bread'],
+            'baguette': ['bakery', 'bread'],
+            'rice': ['staples', 'rice'],
+            'oil': ['groceries', 'oil'],
+            'bottle': ['drinks', 'oil'],
+            'vegetable': ['produce', 'vegetables'],
+            'broccoli': ['produce', 'vegetables'],
+            'beverage': ['drinks'],
+            'soda': ['drinks'],
+            'snack': ['snacks'],
+            'packet': ['snacks', 'groceries']
+        };
+
+        const matched = [];
+        const seen = new Set();
+
+        for (const pred of predictions) {
+            const label = pred.className.toLowerCase();
+            for (const [keyword, categories] of Object.entries(keywordMap)) {
+                if (label.includes(keyword)) {
+                    for (const cat of categories) {
+                        for (const p of this.products) {
+                            if ((p.category.toLowerCase().includes(cat) || p.name.toLowerCase().includes(keyword)) && !seen.has(p.id)) {
+                                matched.push({...p, _matched: keyword});
+                                seen.add(p.id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return matched.slice(0, 6);
     }
 
-    return matchedProducts.slice(0,6);
-  }
-
-  // Full image search pipeline - FREE
-  async searchByImage(file) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.dataset.fileName = file.name;
-      img.onload = async () => {
-        const predictions = await this.classifyImage(img);
-        const products = this.mapToProducts(predictions, file.name);
-        resolve({ predictions, products, fileName: file.name });
-      };
-      img.onerror = () => {
-        const products = this.mapToProducts([], file.name);
-        resolve({ predictions: [], products, fileName: file.name });
-      };
-      img.src = URL.createObjectURL(file);
-    });
-  }
+    async searchByImage(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = async () => {
+                try {
+                    let products = [];
+                    let predictions = [];
+                    
+                    if (this.modelLoaded) {
+                        predictions = await this.classifyImage(img);
+                        products = this.mapToProducts(predictions);
+                    }
+                    
+                    if (products.length === 0) {
+                        // Fallback to server
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        const res = await fetch('/api/image-search', {method: 'POST', body: formData});
+                        const data = await res.json();
+                        products = data.matched || [];
+                    }
+                    
+                    resolve({products, predictions, fileName: file.name});
+                } catch (e) {
+                    reject(e);
+                }
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(file);
+        });
+    }
 }
 
-// AR Product Preview - WebXR + Camera - FREE
 class ARPreview {
-  constructor() {
-    this.isSupported = this.checkSupport();
-    this.activeProduct = null;
-  }
+    constructor() {
+        this.active = false;
+        this.overlay = null;
+    }
 
-  checkSupport() {
-    // Check WebXR or simple camera AR support
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || 
-           !!(window.XRSystem) ||
-           true; // Always allow fallback
-  }
+    checkSupport() {
+        return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    }
 
-  // Simple AR via camera overlay - FREE, no 3D models needed
-  async startAR(product) {
-    this.activeProduct = product;
-    
-    // Create AR overlay
-    const arOverlay = document.createElement('div');
-    arOverlay.id = 'arOverlay';
-    arOverlay.style.cssText = `
-      position: fixed; inset: 0; z-index: 9999; background: black;
-      display: flex; flex-direction: column;
-    `;
-    arOverlay.innerHTML = `
-      <div style="background: rgba(15,23,42,0.9); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-weight: 700;">📱 AR Preview — ${product.name}</div>
-          <div style="font-size: 0.8rem; color: #94a3b8;">Point camera at table — See ${product.name} in your space — 58 5th Ave Retreat</div>
-        </div>
-        <button id="arClose" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; cursor: pointer;">✕</button>
-      </div>
-      <div style="flex: 1; position: relative; overflow: hidden; background: #000;">
-        <video id="arVideo" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
-        <div id="arProduct" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; background: white; border-radius: 16px; padding: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 2px solid #059669; text-align: center; animation: arFloat 3s infinite ease-in-out;">
-          <img src="/static/images/${product.image}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem;" onerror="this.src='/static/images/rice.jpg'">
-          <div style="font-weight: 700; font-size: 1rem; color: #0f172a;">${product.name}</div>
-          <div style="font-size: 0.85rem; color: #059669; font-weight: 600;">R${product.special_price || product.price} • ${product.category}</div>
-          <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">📍 58 5th Ave, Retreat • 063 837 8201</div>
-          <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-            <button class="btn btn-primary" style="flex: 1; padding: 0.6rem; font-size: 0.8rem;" onclick="window.addToCartFromAR && window.addToCartFromAR(${product.id})"><span>Add to Cart</span></button>
-            <a href="https://wa.me/${window.BUSINESS_WHATSAPP || '27638378201'}?text=Hi!%20I%20saw%20${encodeURIComponent(product.name)}%20in%20AR%20at%20Family%20Supermarket%20Retreat!%20Price%20R${product.special_price || product.price}%20—%20Order%20now%20at%2058%205th%20Ave" target="_blank" class="btn btn-secondary" style="flex: 1; padding: 0.6rem; font-size: 0.8rem; background: #25D366; color: white; border-color: #25D366; text-decoration: none; justify-content: center;">WhatsApp</a>
-          </div>
-        </div>
-        <div style="position: absolute; bottom: 1rem; left: 1rem; right: 1rem; background: rgba(0,0,0,0.7); color: white; border-radius: 12px; padding: 0.75rem; font-size: 0.8rem; text-align: center; backdrop-filter: blur(10px);">
-          👆 Drag product to move • Pinch to resize • Real product at 58 5th Ave, Retreat • Call 063 837 8201 • Tap ✕ to exit AR
-        </div>
-      </div>
-      <style>
-        @keyframes arFloat {
-          0%, 100% { transform: translate(-50%, -50%) translateY(0) rotate(-1deg); }
-          50% { transform: translate(-50%, -50%) translateY(-10px) rotate(1deg); }
+    async startAR(product) {
+        if (!this.checkSupport()) {
+            alert('Camera not supported on this device. Call 063 837 8201 to see product at 58 5th Ave Retreat.');
+            return;
         }
-      </style>
-    `;
-    
-    document.body.appendChild(arOverlay);
-    document.body.style.overflow = 'hidden';
-    
-    // Start camera - FREE
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
-      });
-      const video = document.getElementById('arVideo');
-      if (video) {
-        video.srcObject = stream;
-        video.onloadedmetadata = () => video.play();
-      }
-      
-      // Make product draggable - FREE AR interaction
-      this.makeDraggable();
-      
-    } catch (e) {
-      console.log('Camera failed, showing AR without camera', e);
-      const video = document.getElementById('arVideo');
-      if (video) {
-        video.style.display = 'none';
-        video.parentElement.style.background = 'radial-gradient(800px circle at 50% 50%, rgba(16,185,129,0.2), #0f172a)';
-      }
+
+        // Create overlay
+        this.overlay = document.createElement('div');
+        this.overlay.id = 'arOverlay';
+        this.overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:black;display:flex;flex-direction:column;';
+        this.overlay.innerHTML = `
+            <div style="position:relative;flex:1;overflow:hidden;">
+                <video id="arVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;"></video>
+                <div id="arProduct" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;background:white;border-radius:16px;padding:1rem;box-shadow:0 10px 40px rgba(0,0,0,0.3);cursor:move;animation: float 3s ease-in-out infinite;">
+                    <img src="/static/images/${product.image}" style="width:100%;height:120px;object-fit:cover;border-radius:12px;margin-bottom:0.5rem;" onerror="this.src='/static/images/rice.jpg'">
+                    <div style="font-weight:700;font-size:0.95rem;">${product.name}</div>
+                    <div style="color:#059669;font-weight:700;">R${product.price}</div>
+                    <div style="font-size:0.75rem;color:#64748b;">${product.category} • 58 5th Ave Retreat</div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+                        <button onclick="window.addToCartFromAR && window.addToCartFromAR(${product.id})" style="flex:1;background:#0f172a;color:white;border:none;padding:0.5rem;border-radius:20px;font-weight:600;cursor:pointer;">Add to Cart</button>
+                        <button onclick="window.aliUX && window.aliUX.closeBottomSheet(); document.getElementById('arOverlay')?.remove();" style="background:white;border:1px solid #e2e8f0;padding:0.5rem 0.8rem;border-radius:20px;cursor:pointer;">✕</button>
+                    </div>
+                    <div style="font-size:0.7rem;color:#64748b;margin-top:0.5rem;text-align:center;">Drag to move • 063 837 8201</div>
+                </div>
+                <button onclick="document.getElementById('arOverlay')?.remove()" style="position:absolute;top:1rem;right:1rem;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:1.2rem;">✕</button>
+                <div style="position:absolute;bottom:1rem;left:1rem;right:1rem;background:rgba(0,0,0,0.7);color:white;padding:0.75rem;border-radius:12px;font-size:0.85rem;text-align:center;">
+                    Point camera at table to see ${product.name} in your space<br>58 5th Ave, Retreat • 063 837 8201
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(this.overlay);
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}});
+            const video = document.getElementById('arVideo');
+            if (video) video.srcObject = stream;
+            
+            // Make draggable
+            this.makeDraggable(document.getElementById('arProduct'));
+            
+            this.active = true;
+        } catch (e) {
+            console.log('Camera failed', e);
+            // Show without camera
+            const video = document.getElementById('arVideo');
+            if (video) video.style.display = 'none';
+            this.overlay.style.background = '#f8fafc';
+        }
     }
-    
-    // Close handlers
-    document.getElementById('arClose')?.addEventListener('click', () => this.stopAR());
-    arOverlay.addEventListener('click', (e) => {
-      if (e.target.id === 'arOverlay') this.stopAR();
-    });
-    
-    console.log(`✅ AR Preview started for ${product.name} - FREE WebXR`);
-  }
-  
-  makeDraggable() {
-    const productEl = document.getElementById('arProduct');
-    if (!productEl) return;
-    
-    let isDragging = false;
-    let startX, startY, initialLeft, initialTop;
-    
-    const startDrag = (e) => {
-      isDragging = true;
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      startX = clientX;
-      startY = clientY;
-      const rect = productEl.getBoundingClientRect();
-      initialLeft = rect.left;
-      initialTop = rect.top;
-      productEl.style.transition = 'none';
-    };
-    
-    const drag = (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const dx = clientX - startX;
-      const dy = clientY - startY;
-      productEl.style.left = (initialLeft + dx) + 'px';
-      productEl.style.top = (initialTop + dy) + 'px';
-      productEl.style.transform = 'translate(0, 0)';
-    };
-    
-    const endDrag = () => {
-      isDragging = false;
-      productEl.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-    };
-    
-    productEl.addEventListener('mousedown', startDrag);
-    productEl.addEventListener('touchstart', startDrag, {passive: false});
-    window.addEventListener('mousemove', drag);
-    window.addEventListener('touchmove', drag, {passive: false});
-    window.addEventListener('mouseup', endDrag);
-    window.addEventListener('touchend', endDrag);
-  }
-  
-  stopAR() {
-    const overlay = document.getElementById('arOverlay');
-    if (overlay) {
-      // Stop camera
-      const video = document.getElementById('arVideo');
-      if (video && video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-      }
-      overlay.remove();
-      document.body.style.overflow = '';
+
+    makeDraggable(el) {
+        if (!el) return;
+        let pos1=0,pos2=0,pos3=0,pos4=0;
+        el.onmousedown = dragMouseDown;
+        el.ontouchstart = dragTouchStart;
+
+        function dragMouseDown(e) {
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDrag;
+            document.onmousemove = elementDrag;
+        }
+
+        function dragTouchStart(e) {
+            pos3 = e.touches[0].clientX;
+            pos4 = e.touches[0].clientY;
+            document.ontouchend = closeDrag;
+            document.ontouchmove = elementTouchDrag;
+        }
+
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            el.style.top = (el.offsetTop - pos2) + 'px';
+            el.style.left = (el.offsetLeft - pos1) + 'px';
+            el.style.transform = 'none';
+        }
+
+        function elementTouchDrag(e) {
+            pos1 = pos3 - e.touches[0].clientX;
+            pos2 = pos4 - e.touches[0].clientY;
+            pos3 = e.touches[0].clientX;
+            pos4 = e.touches[0].clientY;
+            el.style.top = (el.offsetTop - pos2) + 'px';
+            el.style.left = (el.offsetLeft - pos1) + 'px';
+            el.style.transform = 'none';
+        }
+
+        function closeDrag() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            document.ontouchend = null;
+            document.ontouchmove = null;
+        }
     }
-    console.log('AR stopped');
-  }
+
+    stopAR() {
+        if (this.overlay) {
+            const video = document.getElementById('arVideo');
+            if (video && video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+            }
+            this.overlay.remove();
+            this.overlay = null;
+            this.active = false;
+        }
+    }
 }
-
-// Export
-window.ImageSearchAI = ImageSearchAI;
-window.ARPreview = ARPreview;
-
-console.log('🔥 AR + Image Search loaded - TensorFlow.js + WebXR - FREE - 063 837 8201');

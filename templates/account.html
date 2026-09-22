@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if user %}My Account — {{ user['name'] }}{% elif login_mode %}Login{% elif register_mode %}Create Account{% else %}Account{% endif %} — Family Supermarket Retreat</title>
+    <meta name="description" content="My account at Family Supermarket Retreat — orders, reviews, 58 5th Ave, 063 837 8201">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modern-ux.css') }}">
+    <style>
+        .account-wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        .account-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; }
+        .form-input { width: 100%; padding: 0.9rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; margin-bottom: 0.9rem; }
+        .form-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 2px rgba(5,150,105,0.15); }
+        .btn-primary { background: #0f172a; color: white; border: none; padding: 0.9rem 1.25rem; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-primary:hover { background: #1e293b; }
+        .btn-secondary { background: white; color: #0f172a; border: 1px solid #e2e8f0; padding: 0.9rem 1.25rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .order-item { background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">F</div>
+                <div class="logo-text"><span class="logo-title">Family Supermarket</span><span class="logo-subtitle">Wholesalers • Retreat</span></div>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Shop</a>
+                <a href="/specials" class="nav-link">Specials</a>
+                <a href="/account" class="nav-link active">Account</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="account-wrap">
+        {% if user %}
+        <!-- LOGGED IN - ACCOUNT DASHBOARD -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-family: 'Space Grotesk'; font-size: 2rem; line-height: 1;">Hi, {{ user['name'] }} 👋</h1>
+                <p style="color: #64748b;">{{ user['email'] or '' }} {% if user['email'] and user['phone'] %}•{% endif %} {{ user['phone'] or '' }} • Member since {{ user['created_at'][:10] }}</p>
+            </div>
+            <a href="/logout" class="btn-secondary" style="padding: 0.6rem 1rem; text-decoration: none;">Logout</a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="account-card" style="text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 800;">{{ orders|length }}</div>
+                <div style="color: #64748b; font-size: 0.9rem;">Orders</div>
+            </div>
+            <div class="account-card" style="text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 800;">R{{ total_spent|round(2) }}</div>
+                <div style="color: #64748b; font-size: 0.9rem;">Total Spent</div>
+            </div>
+            <div class="account-card" style="text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: 800;">{{ reviews|length }}</div>
+                <div style="color: #64748b; font-size: 0.9rem;">Reviews</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+            <div>
+                <h3 style="margin-bottom: 1rem;">📦 My Orders</h3>
+                {% if orders %}
+                    {% for order in orders %}
+                    <div class="order-item">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <strong>Order #{{ order['id'] }}</strong>
+                            <span style="background: {% if order['status']=='pending' %}#fef3c7{% else %}#f0fdf4{% endif %}; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">{{ order['status'] }}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">{{ order['created_at'] }} • R{{ order['total'] }}</div>
+                        <div style="font-size: 0.85rem;">
+                            {% set items = order['items']|tojson|safe %}
+                            <span id="order-items-{{ order['id'] }}">Loading...</span>
+                            <script>
+                                try {
+                                    const items = JSON.parse('{{ order["items"]|replace("'", "\\'")|replace('"', '\\"') }}'.replace(/&quot;/g,'"'));
+                                } catch {}
+                            </script>
+                            {% for item in order['items']|tojson %}
+                            {% endfor %}
+                            <div style="font-size: 0.8rem; color: #475569; white-space: pre-wrap;">{{ order['items'] }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="account-card" style="text-align: center; color: #64748b;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛒</div>
+                        No orders yet<br>
+                        <a href="/" style="color: #059669; font-weight: 600;">Start shopping →</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <h3 style="margin-bottom: 1rem;">⭐ My Reviews</h3>
+                <div class="account-card">
+                    <h4 style="margin-bottom: 0.75rem;">Leave a review</h4>
+                    <select id="reviewRating" class="form-input" style="margin-bottom: 0.5rem;">
+                        <option value="5">★★★★★ 5 - Excellent</option>
+                        <option value="4">★★★★ 4 - Good</option>
+                        <option value="3">★★★ 3 - Average</option>
+                        <option value="2">★★ 2 - Poor</option>
+                        <option value="1">★ 1 - Bad</option>
+                    </select>
+                    <textarea id="reviewText" class="form-input" rows="3" placeholder="Your review about Family Supermarket Retreat..."></textarea>
+                    <button onclick="submitReview()" class="btn-primary">Submit Review</button>
+                    <div id="reviewStatus" style="font-size: 0.85rem; margin-top: 0.5rem;"></div>
+                </div>
+
+                {% if reviews %}
+                    {% for r in reviews %}
+                    <div class="order-item">
+                        <div style="color: #f59e0b;">{{ "★"*r['rating'] }}{{ "☆"*(5-r['rating']) }}</div>
+                        <div style="font-size: 0.9rem; margin: 0.4rem 0;">{{ r['text'] }}</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">{{ r['created_at'][:10] }} • Verified</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="font-size: 0.85rem; color: #64748b; text-align: center; padding: 1rem;">No reviews yet — be the first!</div>
+                {% endif %}
+
+                <div class="account-card" style="margin-top: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">📍 Store Info</h4>
+                    <div style="font-size: 0.9rem; line-height: 1.5;">
+                        58 5th Ave, Retreat, Cape Town 7965<br>
+                        📞 063 837 8201<br>
+                        WhatsApp: 27638378201<br>
+                        Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% elif login_mode %}
+        <!-- LOGIN -->
+        <div style="max-width: 420px; margin: 3rem auto;">
+            <div class="account-card">
+                <h1 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem;">Welcome back</h1>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Login to see your orders, reviews, and account — 58 5th Ave Retreat</p>
+                
+                <input type="text" id="loginIdentifier" class="form-input" placeholder="Email or Phone (e.g. 063 837 8201)">
+                <input type="password" id="loginPassword" class="form-input" placeholder="Password (min 6 characters)">
+                
+                <button onclick="doLogin()" class="btn-primary" style="margin-bottom: 1rem;">Login</button>
+                <div id="loginStatus" style="font-size: 0.85rem; text-align: center; margin-bottom: 1rem;"></div>
+                
+                <div style="text-align: center; font-size: 0.9rem;">
+                    No account? <a href="/register" style="color: #059669; font-weight: 600;">Create account</a><br>
+                    <a href="/" style="color: #64748b;">← Back to shop</a>
+                </div>
+            </div>
+        </div>
+
+        {% elif register_mode %}
+        <!-- REGISTER -->
+        <div style="max-width: 420px; margin: 3rem auto;">
+            <div class="account-card">
+                <h1 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem;">Create account</h1>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Join Family Supermarket Retreat — track orders, reviews — 58 5th Ave</p>
+                
+                <input type="text" id="regName" class="form-input" placeholder="Full Name">
+                <input type="email" id="regEmail" class="form-input" placeholder="Email (optional if phone provided)">
+                <input type="tel" id="regPhone" class="form-input" placeholder="Phone e.g. 063 837 8201 (optional if email provided)">
+                <input type="password" id="regPassword" class="form-input" placeholder="Password (min 6 characters)">
+                
+                <button onclick="doRegister()" class="btn-primary" style="margin-bottom: 1rem;">Create Account</button>
+                <div id="regStatus" style="font-size: 0.85rem; text-align: center; margin-bottom: 1rem;"></div>
+                
+                <div style="text-align: center; font-size: 0.9rem;">
+                    Already have account? <a href="/login" style="color: #059669; font-weight: 600;">Login</a><br>
+                    <a href="/" style="color: #64748b;">← Back to shop</a>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- NOT LOGGED IN - SHOW LOGIN/REGISTER OPTIONS -->
+        <div style="max-width: 600px; margin: 3rem auto; text-align: center;">
+            <h1 style="font-family: 'Space Grotesk'; font-size: 2rem; margin-bottom: 1rem;">My Account</h1>
+            <p style="color: #64748b; margin-bottom: 2rem;">Login or create account to see your orders, reviews, and more — 58 5th Ave Retreat • 063 837 8201</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <a href="/login" style="text-decoration: none;">
+                    <div class="account-card" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔑</div>
+                        <strong>Login</strong><br>
+                        <span style="font-size: 0.85rem; color: #64748b;">Email or phone + password</span>
+                    </div>
+                </a>
+                <a href="/register" style="text-decoration: none;">
+                    <div class="account-card" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+                        <strong>Create Account</strong><br>
+                        <span style="font-size: 0.85rem; color: #64748b;">Email or phone + password</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <a href="/" class="btn-secondary" style="text-decoration: none; display: inline-block;">← Continue Shopping</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        async function doLogin() {
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const status = document.getElementById('loginStatus');
+            
+            if (!identifier || !password) {
+                status.textContent = 'Enter email/phone and password';
+                status.style.color = '#ef4444';
+                return;
+            }
+            
+            status.textContent = 'Logging in...';
+            status.style.color = '#64748b';
+            
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({identifier, password})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = 'Success! Redirecting...';
+                    status.style.color = '#059669';
+                    setTimeout(() => window.location.href = '/account', 500);
+                } else {
+                    status.textContent = data.error || 'Login failed';
+                    status.style.color = '#ef4444';
+                }
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#ef4444';
+            }
+        }
+
+        async function doRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const status = document.getElementById('regStatus');
+            
+            if (!name || !password) {
+                status.textContent = 'Name and password required';
+                status.style.color = '#ef4444';
+                return;
+            }
+            if (!email && !phone) {
+                status.textContent = 'Email or phone required';
+                status.style.color = '#ef4444';
+                return;
+            }
+            
+            status.textContent = 'Creating account...';
+            status.style.color = '#64748b';
+            
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, email, phone, password})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = data.message + ' Redirecting...';
+                    status.style.color = '#059669';
+                    setTimeout(() => window.location.href = '/account', 800);
+                } else {
+                    status.textContent = data.error || 'Registration failed';
+                    status.style.color = '#ef4444';
+                }
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#ef4444';
+            }
+        }
+
+        async function submitReview() {
+            const rating = document.getElementById('reviewRating').value;
+            const text = document.getElementById('reviewText').value.trim();
+            const status = document.getElementById('reviewStatus');
+            
+            if (!text) {
+                status.textContent = 'Write your review';
+                status.style.color = '#ef4444';
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/user/review', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({rating: parseInt(rating), text})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = 'Review submitted! Thank you.';
+                    status.style.color = '#059669';
+                    document.getElementById('reviewText').value = '';
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    status.textContent = data.error;
+                    status.style.color = '#ef4444';
+                }
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                status.style.color = '#ef4444';
+            }
+        }
+
+        // Allow Enter key
+        document.getElementById('loginPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+        document.getElementById('regPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') doRegister(); });
+    </script>
+</body>
+</html>

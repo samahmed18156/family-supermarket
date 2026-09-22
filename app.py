@@ -1,16 +1,17 @@
-import os, json, sqlite3
+import os, json, sqlite3, secrets
 from pathlib import Path
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 from functools import lru_cache
 from werkzeug.utils import secure_filename
-from flask import Flask, render_template, request, jsonify, Response
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, jsonify, Response, session, redirect, url_for
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Upload config - FREE local storage
+# Upload config - local storage
 UPLOAD_FOLDER = Path("static/images")
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 UPLOAD_FOLDER.mkdir(exist_ok=True)
@@ -20,12 +21,10 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# BUSINESS WHATSAPP - Change this to your number! FREE config
-# Format: Country code + number without 0, e.g. South Africa 063 837 8201 -> 27638378201
-# You can also set BUSINESS_WHATSAPP env var in Render
-BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27638378201")  # NEW: 063 837 8201
-BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "063 837 8201")  # For display
-GOOGLE_VERIFICATION = os.getenv("GOOGLE_VERIFICATION", "")  # For Search Console
+# BUSINESS WHATSAPP
+BUSINESS_WHATSAPP = os.getenv("BUSINESS_WHATSAPP", "27638378201")
+BUSINESS_PHONE_DISPLAY = os.getenv("BUSINESS_PHONE_DISPLAY", "063 837 8201")
+GOOGLE_VERIFICATION = os.getenv("GOOGLE_VERIFICATION", "")
 
 DB_PATH = "inquiries.db"
 PRODUCTS_FILE = Path("products.json")
@@ -44,7 +43,29 @@ def init_db():
         items TEXT NOT NULL,
         total REAL NOT NULL,
         status TEXT DEFAULT 'pending',
+        user_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE,
+        phone TEXT UNIQUE,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    conn.execute("""CREATE TABLE IF NOT EXISTS reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        user_name TEXT,
+        rating INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        verified INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id))""")
+    # Add user_id column to orders if missing (migration)
+    try:
+        conn.execute("ALTER TABLE orders ADD COLUMN user_id INTEGER")
+    except:
+        pass
     conn.commit()
     conn.close()
 
@@ -237,12 +258,48 @@ def get_store_status(now):
 
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", secrets.token_hex(32))
 init_db()
+
+# ===== USER HELPERS =====
+def get_user_by_id(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
+def get_user_by_email_or_phone(identifier):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE email = ? OR phone = ?", (identifier, identifier))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
+def get_user_orders(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+def get_current_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    return get_user_by_id(user_id)
 
 
 @app.context_processor
 def inject_globals():
     now = datetime.now(ZoneInfo("Africa/Johannesburg"))
+    user = get_current_user()
     return {
         "store_status": get_store_status(now),
         "store_hours": STORE_HOURS,
@@ -252,7 +309,8 @@ def inject_globals():
         "business_whatsapp": BUSINESS_WHATSAPP,
         "business_phone_display": BUSINESS_PHONE_DISPLAY,
         "google_verification": GOOGLE_VERIFICATION,
-        "current_year": now.year
+        "current_year": now.year,
+        "current_user": user
     }
 
 
@@ -318,36 +376,6 @@ def api_products():
                                 specials_only=request.args.get('specials') == 'true'))
 
 
-@app.route("/api/checkout", methods=["POST"])
-def api_checkout():
-    data = request.get_json()
-    if not data or not data.get('items'):
-        return jsonify({"success": False, "error": "Cart empty"}), 400
-
-    items = data['items']
-    total = data.get('total', 0)
-    name = data.get('name', 'Guest')
-    phone = data.get('phone', '')
-
-    conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO orders (customer_name, customer_phone, items, total) VALUES (?,?,?,?)",
-                 (name, phone, json.dumps(items), total))
-    conn.commit()
-    conn.close()
-
-    # Generate WhatsApp message
-    wa_text = f"Hi Family Supermarket! New order from {name}:\n"
-    for item in items:
-        wa_text += f"- {item['name']} x{item['qty']} = R{item['price'] * item['qty']:.2f}\n"
-    wa_text += f"\nTotal: R{total:.2f}\nPhone: {phone}"
-
-    return jsonify({
-        "success": True,
-        "order_id": "FS-" + datetime.now().strftime("%Y%m%d%H%M"),
-        "whatsapp_url": f"https://wa.me/{BUSINESS_WHATSAPP}?text={wa_text}"
-    })
-
-
 @app.route("/api/admin/products/update", methods=["POST"])
 def api_update_products():
     key = request.args.get("key") or request.json.get("key")
@@ -369,7 +397,7 @@ def api_update_products():
 
 @app.route("/api/admin/products/add", methods=["POST"])
 def api_add_product():
-    """Add new product with photo upload - 100% FREE local storage"""
+    """Add new product with photo upload"""
     key = request.form.get("key") or request.args.get("key")
     expected = os.getenv("ADMIN_KEY", "changeme")
     if key != expected:
@@ -405,7 +433,7 @@ def api_add_product():
                 file.save(file_path)
                 image_filename = unique_name
 
-                # Optional: create WebP version for speed (FREE with Pillow)
+                # Optional: create WebP version for speed ( with Pillow)
                 try:
                     from PIL import Image
                     img = Image.open(file_path)
@@ -448,7 +476,7 @@ def api_add_product():
         elif special:
             new_product["special_price"] = round(price * 0.85, 2)
 
-        # Calculate profit margin (FREE analytics)
+        # Calculate profit margin ( analytics)
         if cost_price > 0:
             new_product["profit_margin"] = round(((price - cost_price) / price * 100), 1)
             new_product["profit"] = round(price - cost_price, 2)
@@ -484,7 +512,7 @@ def api_delete_product(product_id):
 
 @app.route("/api/admin/products/edit/<int:product_id>", methods=["POST"])
 def api_edit_product(product_id):
-    """Edit existing product - change photo, SOH, cost, all fields - FREE"""
+    """Edit existing product - change photo, SOH, cost, all fields"""
     key = request.form.get("key") or request.args.get("key")
     expected = os.getenv("ADMIN_KEY", "changeme")
     if key != expected:
@@ -580,11 +608,11 @@ def api_analytics():
     return jsonify(get_analytics())
 
 
-# ===== v7 MEGA FEATURES - ALL FREE =====
+# ===== v7 MEGA FEATURES - ALL  =====
 
 @app.route("/api/admin/low-stock")
 def api_low_stock():
-    """1. Low Stock Alerts - FREE"""
+    """1. Low Stock Alerts"""
     threshold = int(request.args.get("threshold", 5))
     low_stock = []
     for p in load_products():
@@ -602,7 +630,7 @@ def api_low_stock():
 
 @app.route("/api/admin/daily-report")
 def api_daily_report():
-    """2. Daily Sales Report - FREE"""
+    """2. Daily Sales Report"""
     from datetime import timedelta
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -659,7 +687,7 @@ Low Stock: {len([p for p in load_products() if p.get('stock', 999) <= 5])} items
 
 @app.route("/api/admin/broadcast")
 def api_broadcast():
-    """4. WhatsApp Broadcast for Specials - FREE"""
+    """4. WhatsApp Broadcast for Specials"""
     specials = get_products(specials_only=True)
     if not specials:
         specials = load_products()[:3]
@@ -689,7 +717,7 @@ def api_broadcast():
 
 @app.route("/api/admin/loyalty")
 def api_loyalty():
-    """Quick Win: Loyalty - FREE"""
+    """Quick Win: Loyalty"""
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
@@ -724,7 +752,7 @@ def api_loyalty():
 
 @app.route("/api/admin/qr")
 def api_qr():
-    """Quick Win: QR Code - FREE"""
+    """Quick Win: QR Code"""
     site_url = request.host_url.rstrip('/')
     # Using free QR API (no key needed)
     qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={site_url}"
@@ -737,7 +765,7 @@ def api_qr():
 
 @app.route("/receipt/<order_id>")
 def receipt(order_id):
-    """5. Print Receipt - FREE"""
+    """5. Print Receipt"""
     # Try to find order by id or just show latest
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -777,13 +805,13 @@ def receipt(order_id):
 
 @app.route("/scan")
 def scan():
-    """3. Barcode Scanner Page - FREE"""
+    """3. Barcode Scanner Page"""
     return render_template("scan.html", products=load_products())
 
 
 @app.route("/sitemap.xml")
 def sitemap():
-    """Enhanced SEO Sitemap - FREE, dynamic, includes products & categories"""
+    """Enhanced SEO Sitemap, dynamic, includes products & categories"""
     base = request.host_url.rstrip('/')
     products = load_products()
     categories = sorted(set(p['category'] for p in products))
@@ -815,7 +843,7 @@ def sitemap():
 
 @app.route("/robots.txt")
 def robots():
-    """Enhanced robots.txt - FREE SEO"""
+    """Enhanced robots.txt SEO"""
     base = request.host_url.rstrip('/')
     txt = f"""User-agent: *
 Allow: /
@@ -839,7 +867,7 @@ Host: {base}
 
 @app.route("/manifest.json")
 def manifest():
-    """PWA Manifest - FREE, helps SEO & installability"""
+    """PWA Manifest, helps SEO & installability"""
     return jsonify({
         "name": "Family Supermarket & Wholesalers",
         "short_name": "Family Market",
@@ -857,7 +885,7 @@ def manifest():
 
 @app.route("/retreat-supermarket")
 def retreat_supermarket():
-    """Location SEO Page - Target 'Retreat supermarket' keyword to beat Shoprite - FREE"""
+    """Location SEO Page - Target 'Retreat supermarket' keyword to beat Shoprite"""
     return render_template("retreat_supermarket.html", 
                          products=get_products()[:8],
                          specials=get_products(specials_only=True)[:6])
@@ -865,7 +893,7 @@ def retreat_supermarket():
 
 @app.route("/supermarket-near-me")
 def near_me():
-    """Near Me SEO - FREE"""
+    """Near Me SEO"""
     return render_template("retreat_supermarket.html",
                          products=get_products()[:8],
                          specials=get_products(specials_only=True)[:6],
@@ -874,65 +902,31 @@ def near_me():
 
 @app.route("/sw.js")
 def service_worker():
-    """PWA Service Worker - FREE"""
+    """PWA Service Worker"""
     return Response(Path("static/sw.js").read_text(), mimetype="application/javascript")
 
 
 @app.route("/offline.html")
 def offline():
-    """Offline fallback - FREE PWA"""
+    """Offline fallback PWA"""
     return render_template("offline.html")
-
-
-@app.route("/api/reviews")
-def api_reviews():
-    """Reviews API - FREE social proof to beat Shoprite"""
-    # Mock reviews + real Google-style reviews
-    reviews = [
-        {"name": "Fatima M.", "rating": 5, "text": "Best Retreat supermarket! Fresh vegetables daily, wholesale prices cheaper than Shoprite. Family service at 58 5th Ave. Call 063 837 8201", "date": "2024-09-15", "verified": True},
-        {"name": "John D.", "rating": 5, "text": "My go-to supermarket in Retreat. 500+ products, great specials, delivery around Retreat. WhatsApp 063 837 8201 — reply in 5 mins!", "date": "2024-09-10", "verified": True},
-        {"name": "Ayesha K.", "rating": 4, "text": "Family owned since 2018, knows my name. Fresh bread daily, rice 10kg best price in Retreat. 58 5th Ave Retreat — highly recommend!", "date": "2024-09-05", "verified": True},
-        {"name": "David S.", "rating": 5, "text": "Cheaper than Pick n Pay Local and Shoprite Retreat. Bulk discounts, wholesale prices for everyone. Family Supermarket Retreat is the best!", "date": "2024-08-28", "verified": True},
-        {"name": "Nuraan L.", "rating": 5, "text": "Love this Retreat supermarket! Fresh produce from local farms, friendly staff, easy WhatsApp ordering at 063 837 8201. Delivery to Steenberg!", "date": "2024-08-20", "verified": True},
-        {"name": "Michael T.", "rating": 4, "text": "Great supermarket in Retreat Cape Town. 58 5th Ave, easy parking, good prices on oil, rice, bread. Family service since 2018.", "date": "2024-08-15", "verified": False},
-    ]
-    
-    # Get real order count for social proof
-    stats = get_stats()
-    
-    return jsonify({
-        "reviews": reviews,
-        "aggregate": {
-            "ratingValue": 4.3,
-            "reviewCount": 11,
-            "bestRating": 5,
-            "worstRating": 1
-        },
-        "stats": stats,
-        "google_url": f"https://search.google.com/local/writereview?placeid=FamilySupermarketRetreat58_5thAve",
-        "whatsapp_review_url": f"https://wa.me/{BUSINESS_WHATSAPP}?text=Hi!%20I%20want%20to%20leave%20a%20review%20for%20Family%20Supermarket%20Retreat%20—%20best%20Retreat%20supermarket%20at%2058%205th%20Ave!"
-    })
 
 
 @app.route("/api/admin/bulk-import", methods=["POST"])
 def api_bulk_import():
-    """Admin Pro - Bulk Import CSV/Excel - FREE"""
+    """Admin Pro - Bulk Import CSV/Excel"""
     key = request.form.get("key") or request.args.get("key")
     expected = os.getenv("ADMIN_KEY", "changeme")
     if key != expected:
         return jsonify({"success": False, "error": "Unauthorized"}), 403
-    
     try:
         file = request.files.get('file')
         if not file:
             return jsonify({"success": False, "error": "No file"}), 400
-        
         filename = secure_filename(file.filename)
         ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
-        
         products = load_products()
         imported = 0
-        
         if ext == 'json':
             data = json.loads(file.read().decode('utf-8'))
             for item in data:
@@ -968,40 +962,8 @@ def api_bulk_import():
                         imported += 1
                 except:
                     continue
-        elif ext in ['xlsx', 'xls']:
-            try:
-                import openpyxl
-                wb = openpyxl.load_workbook(file)
-                ws = wb.active
-                headers = [cell.value for cell in ws[1]]
-                for row in ws.iter_rows(min_row=2, values_only=True):
-                    try:
-                        data = dict(zip(headers, row))
-                        if not data.get('name'): continue
-                        new_id = max([p.get('id', 0) for p in products], default=0) + 1
-                        prod = {
-                            "id": new_id,
-                            "name": str(data.get('name', '')).strip(),
-                            "category": str(data.get('category', 'General')).strip(),
-                            "price": float(data.get('price', 0)),
-                            "cost_price": float(data.get('cost_price', 0) or 0),
-                            "stock": int(data.get('stock', 0) or 0),
-                            "unit": str(data.get('unit', 'unit')).strip(),
-                            "image": str(data.get('image', 'rice.jpg')).strip(),
-                            "in_stock": int(data.get('stock', 0) or 0) > 0,
-                            "special": str(data.get('special', '')).lower() == 'true'
-                        }
-                        if prod['name'] and prod['price'] > 0:
-                            products.append(prod)
-                            imported += 1
-                    except:
-                        continue
-            except ImportError:
-                return jsonify({"success": False, "error": "openpyxl not installed, use CSV"}), 400
-        
         Path("products.json").write_text(json.dumps(products, indent=2))
         load_products.cache_clear()
-        
         return jsonify({"success": True, "imported": imported, "total": len(products)})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -1009,15 +971,12 @@ def api_bulk_import():
 
 @app.route("/api/admin/bulk-export")
 def api_bulk_export():
-    """Admin Pro - Bulk Export - FREE"""
     key = request.args.get("key")
     expected = os.getenv("ADMIN_KEY", "changeme")
     if key != expected:
         return jsonify({"success": False, "error": "Unauthorized"}), 403
-    
     format_type = request.args.get("format", "json")
     products = load_products()
-    
     if format_type == "csv":
         import csv, io
         output = io.StringIO()
@@ -1032,12 +991,10 @@ def api_bulk_export():
 
 @app.route("/api/admin/profit-analytics")
 def api_profit_analytics():
-    """Admin Pro - Profit Analytics - FREE"""
     products = load_products()
     total_profit = 0
     total_revenue_potential = 0
     low_margin = []
-    
     for p in products:
         stock = p.get('stock', 0)
         price = p.get('price', 0)
@@ -1049,31 +1006,22 @@ def api_profit_analytics():
             margin = ((price - cost) / price * 100) if price > 0 else 0
             if margin < 20:
                 low_margin.append({"name": p['name'], "margin": round(margin,1), "price": price, "cost": cost})
-    
     return jsonify({
         "total_products": len(products),
         "total_stock_value": round(total_revenue_potential, 2),
         "total_profit_potential": round(total_profit, 2),
         "avg_margin": round((total_profit / total_revenue_potential * 100) if total_revenue_potential > 0 else 0, 1),
-        "low_margin_products": low_margin[:10],
-        "whatsapp_report": f"💰 PROFIT REPORT\nTotal Stock Value: R{total_revenue_potential:.2f}\nProfit Potential: R{total_profit:.2f}\nLow Margin: {len(low_margin)} items"
+        "low_margin_products": low_margin[:10]
     })
 
 
 @app.route("/api/ai/chat", methods=["POST"])
 def api_ai_chat():
-    """Advanced AI Chatbot API - FREE, no OpenAI, rule-based"""
     data = request.get_json()
     message = data.get('message', '').strip()
     if not message:
         return jsonify({"success": False, "error": "No message"}), 400
-    
     products = load_products()
-    
-    # Simple intent detection (same as JS, but server-side)
-    msg_lower = message.lower()
-    
-    # Search products
     def search_prods(q):
         q = q.lower()
         results = []
@@ -1083,60 +1031,37 @@ def api_ai_chat():
             if q in name or q in cat or any(word in name for word in q.split()):
                 results.append(p)
         return results[:3]
-    
     found = search_prods(message)
-    
-    # Generate response
+    msg_lower = message.lower()
     if any(w in msg_lower for w in ['hour','open','close','time']):
-        response = f"🕒 Family Supermarket Retreat: Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm. 58 5th Ave, Retreat. Call {BUSINESS_PHONE_DISPLAY}."
+        response = f"Family Supermarket Retreat: Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm. 58 5th Ave, Retreat. Call {BUSINESS_PHONE_DISPLAY}."
     elif any(w in msg_lower for w in ['where','location','address','find','map']):
-        response = f"📍 58 5th Ave, Retreat, Cape Town 7965. Near Retreat Station. Coords -34.0552,18.4764. Call {BUSINESS_PHONE_DISPLAY} or WhatsApp +{BUSINESS_WHATSAPP}."
+        response = f"58 5th Ave, Retreat, Cape Town 7965. Near Retreat Station. Call {BUSINESS_PHONE_DISPLAY} or WhatsApp +{BUSINESS_WHATSAPP}."
     elif any(w in msg_lower for w in ['deliver','steenberg','lavender']):
-        response = f"🚚 Yes! Delivery around Retreat, Steenberg, Lavender Hill. WhatsApp {BUSINESS_PHONE_DISPLAY} — reply in 5 mins! 58 5th Ave."
+        response = f"Yes! Delivery around Retreat, Steenberg, Lavender Hill. WhatsApp {BUSINESS_PHONE_DISPLAY} — reply in 5 mins! 58 5th Ave."
     elif any(w in msg_lower for w in ['special','deal','discount']):
         specials = [p for p in products if p.get('special')][:3]
-        response = f"🔥 {len(specials)} specials: " + ", ".join([f"{p['name']} R{p.get('special_price', p['price'])}" for p in specials]) + f". 58 5th Ave Retreat. {BUSINESS_PHONE_DISPLAY}"
+        response = f"{len(specials)} specials: " + ", ".join([f"{p['name']} R{p.get('special_price', p['price'])}" for p in specials]) + f". 58 5th Ave Retreat. {BUSINESS_PHONE_DISPLAY}"
     elif found:
         response = f"Found {len(found)} products: " + "; ".join([f"{p['name']} R{p.get('special_price', p['price'])} ({p['category']})" for p in found]) + f". Call {BUSINESS_PHONE_DISPLAY} for bulk!"
     else:
-        response = f"Hi! Family Supermarket Retreat at 58 5th Ave — 500+ products, wholesale prices, cheaper than Shoprite Retreat. Ask: rice price, hours, delivery, specials. Call {BUSINESS_PHONE_DISPLAY}."
-    
-    return jsonify({
-        "success": True,
-        "response": response,
-        "products": found,
-        "intent": "product_search" if found else "general",
-        "business_phone": BUSINESS_PHONE_DISPLAY,
-        "whatsapp": BUSINESS_WHATSAPP
-    })
+        response = f"Hi! Family Supermarket Retreat at 58 5th Ave — 500+ products, wholesale prices. Ask: rice price, hours, delivery, specials. Call {BUSINESS_PHONE_DISPLAY}."
+    return jsonify({"success": True, "response": response, "products": found, "business_phone": BUSINESS_PHONE_DISPLAY, "whatsapp": BUSINESS_WHATSAPP})
 
 
 @app.route("/api/ai/recommendations", methods=["POST"])
 def api_ai_recommendations():
-    """Smart Recommendations API - FREE ML"""
     data = request.get_json()
     cart_ids = data.get('cart', [])
     products = load_products()
-    
-    # Simple association rules
-    rules = {
-        'rice': ['oil', 'vegetables'],
-        'bread': ['drinks', 'snacks'],
-        'oil': ['rice', 'vegetables'],
-        'vegetables': ['rice', 'oil'],
-        'drinks': ['snacks'],
-        'snacks': ['drinks']
-    }
-    
+    rules = {'rice': ['oil', 'vegetables'], 'bread': ['drinks', 'snacks'], 'oil': ['rice', 'vegetables'], 'vegetables': ['rice', 'oil'], 'drinks': ['snacks'], 'snacks': ['drinks']}
     cart_cats = []
     for cid in cart_ids:
         prod = next((p for p in products if p['id'] == cid), None)
         if prod:
             cart_cats.append(prod['category'].lower())
-    
     recommended = []
     seen = set(cart_ids)
-    
     for cat in set(cart_cats):
         for rel in rules.get(cat, []):
             for p in products:
@@ -1146,22 +1071,18 @@ def api_ai_recommendations():
                     break
         if len(recommended) >= 3:
             break
-    
     if len(recommended) < 3:
         for p in products:
             if p.get('special') and p['id'] not in seen:
                 recommended.append(p)
                 if len(recommended) >= 3:
                     break
-    
     return jsonify({"success": True, "recommendations": recommended[:3]})
 
 
 @app.route("/api/live/orders")
 def api_live_orders():
-    """Real-time Live Orders via SSE - FREE"""
     def generate():
-        # Send current stats every 3 seconds for 30 seconds
         for _ in range(10):
             stats = get_stats()
             orders = get_all_orders()
@@ -1169,84 +1090,35 @@ def api_live_orders():
             for o in orders[:3]:
                 try:
                     items = json.loads(o['items'])
-                    latest.append({
-                        "customer": o['customer_name'],
-                        "total": o['total'],
-                        "items": len(items),
-                        "time": o['created_at']
-                    })
+                    latest.append({"customer": o['customer_name'], "total": o['total'], "items": len(items), "time": o['created_at']})
                 except:
                     pass
-            
-            data = {
-                "stats": stats,
-                "latest_orders": latest,
-                "viewers": 3 + (len(orders) % 5),  # Simulated viewers for social proof
-                "low_stock": len([p for p in load_products() if p.get('stock', 999) <= 5])
-            }
-            
+            data = {"stats": stats, "latest_orders": latest, "viewers": 3 + (len(orders) % 5), "low_stock": len([p for p in load_products() if p.get('stock', 999) <= 5])}
             yield f"data: {json.dumps(data)}\n\n"
             import time
             time.sleep(3)
-    
-    return Response(generate(), mimetype="text/event-stream", headers={
-        "Cache-Control": "no-cache",
-        "X-Accel-Buffering": "no"
-    })
+    return Response(generate(), mimetype="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.route("/api/image-search", methods=["POST"])
 def api_image_search():
-    """Advanced Image Search - FREE - Server-side fallback"""
-    key = request.form.get("key") or request.args.get("key")
-    # Allow public for customers, but check if admin wants
-    # expected = os.getenv("ADMIN_KEY", "changeme")
-    # if key != expected: allow public
-    
     try:
         file = request.files.get('image') or request.files.get('photo') or request.files.get('file')
         if not file or not file.filename:
             return jsonify({"success": False, "error": "No image uploaded"}), 400
-        
         if not allowed_file(file.filename):
             return jsonify({"success": False, "error": "Invalid image type"}), 400
-        
         filename = secure_filename(file.filename).lower()
-        
-        # Save temporarily for analysis
         temp_path = UPLOAD_FOLDER / f"temp_search_{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
         file.save(temp_path)
-        
         products = load_products()
-        
-        # Advanced: Use Pillow to analyze image - FREE
         matched = []
         try:
             from PIL import Image
             img = Image.open(temp_path)
             img = img.convert("RGB")
-            # Simple color analysis for demo - FREE
-            # In real advanced, you'd use image embeddings
-            
-            # Search by filename first - most accurate for grocery
+            keyword_map = {'bread': ['bread', 'bakery'], 'rice': ['rice', 'staples'], 'oil': ['oil', 'groceries'], 'vegetable': ['vegetables', 'produce', 'veg'], 'veg': ['vegetables', 'produce'], 'drink': ['drinks'], 'soda': ['drinks'], 'snack': ['snacks'], 'chips': ['snacks'], 'milk': ['dairy', 'milk'], 'apple': ['produce', 'vegetables'], 'fruit': ['produce']}
             name_lower = filename.lower()
-            
-            # Map filename keywords to products
-            keyword_map = {
-                'bread': ['bread', 'bakery'],
-                'rice': ['rice', 'staples'],
-                'oil': ['oil', 'groceries'],
-                'vegetable': ['vegetables', 'produce', 'veg'],
-                'veg': ['vegetables', 'produce'],
-                'drink': ['drinks'],
-                'soda': ['drinks'],
-                'snack': ['snacks'],
-                'chips': ['snacks'],
-                'milk': ['dairy', 'milk'],
-                'apple': ['produce', 'vegetables'],
-                'fruit': ['produce']
-            }
-            
             for keyword, categories in keyword_map.items():
                 if keyword in name_lower:
                     for cat in categories:
@@ -1254,26 +1126,16 @@ def api_image_search():
                             if cat in p['category'].lower() or keyword in p['name'].lower():
                                 if p not in matched:
                                     matched.append(p)
-            
-            # If no keyword match, do color-based fallback (advanced)
             if not matched:
-                # Get dominant color
-                img_small = img.resize((50, 50))
-                # Simple: if greenish -> vegetables, brownish -> bread, etc.
-                # For demo, return specials
                 matched = [p for p in products if p.get('special')][:3]
                 if not matched:
                     matched = products[:3]
-            
-            # Clean up temp file
             try:
                 temp_path.unlink()
             except:
                 pass
-                
         except Exception as e:
             print(f"Image analysis failed: {e}")
-            # Fallback: search by filename
             matched = []
             name_lower = filename.lower()
             for p in products:
@@ -1281,51 +1143,203 @@ def api_image_search():
                     matched.append(p)
             if not matched:
                 matched = products[:3]
-        
-        return jsonify({
-            "success": True,
-            "fileName": filename,
-            "matched": matched[:6],
-            "count": len(matched),
-            "message": f"Found {len(matched)} products matching your image at Family Supermarket Retreat - 58 5th Ave - Call {BUSINESS_PHONE_DISPLAY}",
-            "business_phone": BUSINESS_PHONE_DISPLAY,
-            "whatsapp": BUSINESS_WHATSAPP
-        })
-        
+        return jsonify({"success": True, "fileName": filename, "matched": matched[:6], "count": len(matched), "business_phone": BUSINESS_PHONE_DISPLAY, "whatsapp": BUSINESS_WHATSAPP})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route("/api/ar/models/<product_id>")
 def api_ar_model(product_id):
-    """AR Model data - FREE - Returns product for AR preview"""
     try:
         pid = int(product_id)
         product = next((p for p in load_products() if p['id'] == pid), None)
         if not product:
             return jsonify({"success": False, "error": "Product not found"}), 404
-        
-        # In real AR, you'd return 3D model URL
-        # For FREE version, return image + AR metadata
-        return jsonify({
-            "success": True,
-            "product": product,
-            "ar": {
-                "image": f"/static/images/{product['image']}",
-                "name": product['name'],
-                "price": product.get('special_price', product['price']),
-                "category": product['category'],
-                "business_phone": BUSINESS_PHONE_DISPLAY,
-                "whatsapp": BUSINESS_WHATSAPP,
-                "address": "58 5th Ave, Retreat, Cape Town 7965",
-                "model_url": None,  # Would be .glb file in pro version
-                "ar_enabled": True,
-                "instructions": "Point camera at table to see product in your space"
-            }
-        })
+        return jsonify({"success": True, "product": product, "ar": {"image": f"/static/images/{product['image']}", "name": product['name'], "price": product.get('special_price', product['price']), "category": product['category'], "business_phone": BUSINESS_PHONE_DISPLAY, "whatsapp": BUSINESS_WHATSAPP, "address": "58 5th Ave, Retreat, Cape Town 7965", "ar_enabled": True}})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+# ===== ACCOUNT SYSTEM - Email/Phone + Password =====
+@app.route("/account")
+def account_page():
+    user = get_current_user()
+    if not user:
+        return render_template("account.html", user=None, orders=[], reviews=[])
+    orders = get_user_orders(user['id'])
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM reviews WHERE user_id = ? ORDER BY created_at DESC", (user['id'],))
+    reviews = cur.fetchall()
+    conn.close()
+    total_spent = sum([o['total'] for o in orders]) if orders else 0
+    return render_template("account.html", user=user, orders=orders, reviews=reviews, total_spent=total_spent)
+
+@app.route("/login")
+def login_page():
+    if get_current_user():
+        return redirect(url_for('account_page'))
+    return render_template("account.html", login_mode=True)
+
+@app.route("/register")
+def register_page():
+    if get_current_user():
+        return redirect(url_for('account_page'))
+    return render_template("account.html", register_mode=True)
+
+@app.route("/api/auth/register", methods=["POST"])
+def api_register():
+    data = request.get_json() or request.form
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip().lower()
+    phone = (data.get('phone') or '').strip()
+    password = data.get('password') or ''
+    if not name or not password:
+        return jsonify({"success": False, "error": "Name and password required"}), 400
+    if not email and not phone:
+        return jsonify({"success": False, "error": "Email or phone required"}), 400
+    if len(password) < 6:
+        return jsonify({"success": False, "error": "Password must be at least 6 characters"}), 400
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    if email:
+        cur.execute("SELECT id FROM users WHERE email = ?", (email,))
+        if cur.fetchone():
+            conn.close()
+            return jsonify({"success": False, "error": "Email already registered"}), 400
+    if phone:
+        cur.execute("SELECT id FROM users WHERE phone = ?", (phone,))
+        if cur.fetchone():
+            conn.close()
+            return jsonify({"success": False, "error": "Phone already registered"}), 400
+    password_hash = generate_password_hash(password)
+    try:
+        cur.execute("INSERT INTO users (name, email, phone, password_hash) VALUES (?,?,?,?)", (name, email or None, phone or None, password_hash))
+        conn.commit()
+        user_id = cur.lastrowid
+        conn.close()
+        session['user_id'] = user_id
+        return jsonify({"success": True, "user_id": user_id, "message": f"Welcome {name}! Account created."})
+    except Exception as e:
+        conn.close()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    data = request.get_json() or request.form
+    identifier = (data.get('email') or data.get('phone') or data.get('identifier') or '').strip().lower()
+    password = data.get('password') or ''
+    if not identifier or not password:
+        return jsonify({"success": False, "error": "Email/phone and password required"}), 400
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE email = ? OR phone = ? OR LOWER(email) = ? OR phone = ?", (identifier, data.get('phone') or identifier, identifier, identifier))
+    user = cur.fetchone()
+    conn.close()
+    if not user or not check_password_hash(user['password_hash'], password):
+        return jsonify({"success": False, "error": "Invalid email/phone or password"}), 401
+    session['user_id'] = user['id']
+    return jsonify({"success": True, "user": {"id": user['id'], "name": user['name'], "email": user['email'], "phone": user['phone']}})
+
+@app.route("/api/auth/logout", methods=["POST", "GET"])
+def api_logout():
+    session.pop('user_id', None)
+    if request.args.get('redirect') == 'true' or request.form.get('redirect'):
+        return redirect(url_for('home'))
+    return jsonify({"success": True})
+
+@app.route("/logout")
+def logout_page():
+    session.pop('user_id', None)
+    return redirect(url_for('home'))
+
+@app.route("/api/auth/me")
+def api_me():
+    user = get_current_user()
+    if not user:
+        return jsonify({"success": False, "logged_in": False}), 401
+    orders = get_user_orders(user['id'])
+    total_spent = sum([o['total'] for o in orders]) if orders else 0
+    return jsonify({"success": True, "logged_in": True, "user": {"id": user['id'], "name": user['name'], "email": user['email'], "phone": user['phone'], "created_at": user['created_at']}, "stats": {"orders": len(orders), "total_spent": round(total_spent, 2)}})
+
+@app.route("/api/user/orders")
+def api_user_orders():
+    user = get_current_user()
+    if not user:
+        return jsonify({"success": False, "error": "Not logged in"}), 401
+    orders = get_user_orders(user['id'])
+    result = []
+    for o in orders:
+        try:
+            items = json.loads(o['items'])
+        except:
+            items = []
+        result.append({"id": o['id'], "customer_name": o['customer_name'], "total": o['total'], "status": o['status'], "items": items, "created_at": o['created_at']})
+    return jsonify({"success": True, "orders": result})
+
+@app.route("/api/user/review", methods=["POST"])
+def api_user_review():
+    user = get_current_user()
+    if not user:
+        return jsonify({"success": False, "error": "Login to leave review"}), 401
+    data = request.get_json()
+    rating = int(data.get('rating', 0))
+    text = (data.get('text') or '').strip()
+    if rating < 1 or rating > 5 or not text:
+        return jsonify({"success": False, "error": "Rating 1-5 and text required"}), 400
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO reviews (user_id, user_name, rating, text, verified) VALUES (?,?,?,?,?)", (user['id'], user['name'], rating, text, 1))
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True, "message": "Review submitted!"})
+
+@app.route("/api/checkout", methods=["POST"])
+def api_checkout():
+    data = request.get_json()
+    if not data or not data.get('items'):
+        return jsonify({"success": False, "error": "Cart empty"}), 400
+    items = data['items']
+    total = data.get('total', 0)
+    name = data.get('name', 'Guest')
+    phone = data.get('phone', '')
+    user = get_current_user()
+    user_id = user['id'] if user else None
+    if user:
+        name = user['name']
+        phone = user['phone'] or phone
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("INSERT INTO orders (customer_name, customer_phone, items, total, user_id) VALUES (?,?,?,?,?)", (name, phone, json.dumps(items), total, user_id))
+    conn.commit()
+    conn.close()
+    wa_text = f"Hi Family Supermarket! New order from {name}:\n"
+    for item in items:
+        wa_text += f"- {item['name']} x{item['qty']} = R{item['price'] * item['qty']:.2f}\n"
+    wa_text += f"\nTotal: R{total:.2f}\nPhone: {phone}"
+    return jsonify({"success": True, "order_id": "FS-" + datetime.now().strftime("%Y%m%d%H%M"), "whatsapp_url": f"https://wa.me/{BUSINESS_WHATSAPP}?text={wa_text}"})
+
+@app.route("/api/reviews")
+def api_reviews():
+    """Genuine reviews from DB - no fake data"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM reviews ORDER BY created_at DESC")
+    db_reviews = cur.fetchall()
+    conn.close()
+    reviews = []
+    for r in db_reviews:
+        reviews.append({"name": r['user_name'], "rating": r['rating'], "text": r['text'], "date": r['created_at'][:10] if r['created_at'] else "", "verified": bool(r['verified'])})
+    if reviews:
+        avg = sum([r['rating'] for r in reviews]) / len(reviews)
+        count = len(reviews)
+    else:
+        avg = 0
+        count = 0
+    stats = get_stats()
+    return jsonify({"reviews": reviews, "aggregate": {"ratingValue": round(avg, 1) if avg else 0, "reviewCount": count, "bestRating": 5, "worstRating": 1}, "stats": stats, "has_reviews": len(reviews) > 0})
 
 @app.route("/health")
 def health():
@@ -1334,3 +1348,6 @@ def health():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
+
+
+

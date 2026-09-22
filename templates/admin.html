@@ -80,7 +80,7 @@
 
     <main class="admin-main">
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-            <div><h1 style="font-family: 'Space Grotesk'; font-size: 2.25rem; line-height: 0.9;">Dashboard</h1><p style="color: #64748b; margin-top: 0.6rem;">Manage stock, cost, photos — 100% FREE local storage.</p></div>
+            <div><h1 style="font-family: 'Space Grotesk'; font-size: 2.25rem; line-height: 0.9;">Dashboard</h1><p style="color: #64748b; margin-top: 0.6rem;">Manage stock, cost, photos —  local storage.</p></div>
             <div style="display: flex; gap: 0.6rem;"><button id="refreshBtn" class="btn btn-secondary">↻ Refresh</button><a href="https://wa.me/{{ business_whatsapp }}" target="_blank" class="btn btn-primary"><span>WhatsApp {{ business_phone_display }}</span></a></div>
         </div>
 
@@ -91,9 +91,9 @@
             <div class="stat-card" style="--accent: #8b5cf6;"><div class="num">{{ stats.total_products }}</div><div class="label">Products</div><div class="trend trend-neutral">{{ stats.specials_count }} specials</div></div>
         </div>
 
-        <!-- v7 MEGA FEATURES - ALL FREE -->
+        <!-- v7 MEGA FEATURES - ALL -->
         <div class="admin-section" style="background: linear-gradient(135deg, #fffbeb, white); border: 2px solid #fde68a;">
-            <h3>⚡ Quick Actions — All FREE, No Money Needed</h3>
+            <h3>⚡ Quick Actions — All, No Money Needed</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                 <button onclick="checkLowStock()" class="btn btn-secondary" style="justify-content: center; background: #fef3c7; border-color: #fde68a; color: #92400e;">⚠️ Low Stock Check</button>
                 <button onclick="loadDailyReport()" class="btn btn-secondary" style="justify-content: center; background: #dbeafe; border-color: #bfdbfe; color: #1e40af;">📊 Daily Report</button>
@@ -105,10 +105,10 @@
             <div id="quickActionResult" style="margin-top: 1.25rem; display: none; background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #e2e8f0; white-space: pre-wrap; font-size: 0.9rem; max-height: 400px; overflow-y: auto;"></div>
         </div>
 
-        <!-- ADMIN PRO - BULK IMPORT/EXPORT + PROFIT - FREE -->
+        <!-- ADMIN PRO - BULK IMPORT/EXPORT + PROFIT -->
         <div class="admin-section" style="border: 2px solid #8b5cf6; background: linear-gradient(135deg, #f3e8ff, white);">
             <h3>🛠️ Admin Pro — Bulk Import/Export + Profit Analytics <span style="font-size: 0.7rem; background: #8b5cf6; color: white; padding: 0.3rem 0.7rem; border-radius: 9999px;">CHALLENGE</span></h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Import 100 products via CSV/Excel/JSON in seconds, export for backup, see profit potential — 100% FREE, no money needed.</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Import 100 products via CSV/Excel/JSON in seconds, export for backup, see profit potential — , no money needed.</p>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                 <div style="background: white; border: 1px solid #e9d5ff; border-radius: 12px; padding: 1.25rem;">
@@ -116,7 +116,7 @@
                     <form id="bulkImportForm" enctype="multipart/form-data">
                         <input type="hidden" name="key" value="{{ request.args.get('key','changeme') }}">
                         <input type="file" name="file" accept=".csv,.json,.xlsx,.xls" required style="width: 100%; padding: 0.6rem; border: 1px dashed #c4b5fd; border-radius: 8px; margin-bottom: 0.75rem;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: #8b5cf6;"><span>📥 Import Products — FREE</span></button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: #8b5cf6;"><span>📥 Import Products </span></button>
                     </form>
                     <div id="importStatus" style="font-size: 0.8rem; margin-top: 0.75rem; color: #64748b;"></div>
                     <div style="margin-top: 1rem; font-size: 0.75rem; color: #94a3b8; background: #f5f3ff; padding: 0.75rem; border-radius: 8px;">
@@ -132,7 +132,7 @@
                         <a href="/api/admin/bulk-export?key={{ request.args.get('key','changeme') }}&format=json" class="btn btn-secondary" style="justify-content: center; font-size: 0.85rem;">📄 Export JSON</a>
                         <a href="/api/admin/bulk-export?key={{ request.args.get('key','changeme') }}&format=csv" class="btn btn-secondary" style="justify-content: center; font-size: 0.85rem;">📊 Export CSV</a>
                     </div>
-                    <button onclick="loadProfit()" class="btn btn-secondary" style="width: 100%; justify-content: center; background: #dcfce7; border-color: #bbf7d0; color: #166534;"><span>💰 Profit Analytics — FREE</span></button>
+                    <button onclick="loadProfit()" class="btn btn-secondary" style="width: 100%; justify-content: center; background: #dcfce7; border-color: #bbf7d0; color: #166534;"><span>💰 Profit Analytics </span></button>
                     <div id="profitResult" style="font-size: 0.8rem; margin-top: 0.75rem; background: #f0fdf4; padding: 0.75rem; border-radius: 8px; display: none; white-space: pre-wrap;"></div>
                 </div>
             </div>
@@ -141,7 +141,7 @@
         <!-- ADD NEW PRODUCT - YOUR IDEA! -->
         <div class="admin-section" id="add-product" style="border: 2px solid #059669; background: linear-gradient(135deg, #f0fdf4, white);">
             <h3>➕ Add New Product — With Photo, Cost, Stock <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.2rem 0.6rem; border-radius: 9999px;">NEW</span></h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">Add product with photo upload, cost price, stock on hand, profit auto-calculated. 100% FREE local storage.</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">Add product with photo upload, cost price, stock on hand, profit auto-calculated.  local storage.</p>
 
             <form id="addProductForm" enctype="multipart/form-data" class="add-form">
                 <input type="hidden" name="key" value="{{ request.args.get('key','changeme') }}">
@@ -156,7 +156,7 @@
                         <div id="uploadPrompt">
                             <div style="font-size: 2rem; margin-bottom: 0.5rem;">📸</div>
                             <div style="font-weight: 600;">Click to upload photo or drag & drop</div>
-                            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.3rem;">JPG, PNG, WebP — Max 5MB — Stored FREE locally in static/images/</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.3rem;">JPG, PNG, WebP — Max 5MB — Stored locally in static/images/</div>
                         </div>
                     </div>
                 </div>
@@ -178,13 +178,13 @@
                 <div class="full"><label>Description</label><textarea name="description" rows="2" placeholder="e.g. Fresh full cream milk, 2L bottle, expires in 5 days"></textarea></div>
 
                 <div class="full" style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
-                    <button type="submit" class="btn btn-primary" style="padding: 0.9rem 1.8rem;"><span>➕ Add Product — FREE</span></button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.9rem 1.8rem;"><span>➕ Add Product </span></button>
                     <span id="addStatus" style="font-size: 0.9rem; color: #64748b;"></span>
                 </div>
             </form>
 
             <div style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 12px; border: 1px dashed #cbd5e1; font-size: 0.8rem; color: #64748b;">
-                <strong>💡 How it works (FREE):</strong> Photo saved to <code>static/images/</code> on your server (Render free storage). No Cloudinary, no S3 fees. Cost price + stock used to calculate profit margin. Stock 0 = shows "Out of Stock".
+                <strong>💡 How it works ():</strong> Photo saved to <code>static/images/</code> on your server (Render free storage). No Cloudinary, no S3 fees. Cost price + stock used to calculate profit margin. Stock 0 = shows "Out of Stock".
             </div>
         </div>
 
@@ -207,7 +207,7 @@
 
         <div class="admin-section" id="products">
             <h3>📦 Edit Listed Products — Change Photo, SOH, Cost, All Options <span style="font-size: 0.7rem; background: #059669; color: white; padding: 0.3rem 0.7rem; border-radius: 9999px;">v8 NEW</span></h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Click <strong>Edit</strong> on any product to change photo, stock (SOH), cost price, description, SKU, barcode — all fields. 100% FREE.</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">Click <strong>Edit</strong> on any product to change photo, stock (SOH), cost price, description, SKU, barcode — all fields. .</p>
 
             <div class="product-edit-grid" id="productEditor">
                 {% for p in products %}
@@ -290,7 +290,7 @@
 </div>
 
 <script>
-// v7 QUICK ACTIONS - ALL FREE
+// v7 QUICK ACTIONS - ALL
 async function checkLowStock() {
     const res = await fetch('/api/admin/low-stock?threshold=5');
     const data = await res.json();
@@ -538,7 +538,7 @@ async function loadProfit() {
     const data = await res.json();
     const el = document.getElementById('profitResult');
     el.style.display = 'block';
-    el.innerHTML = `<strong>💰 Profit Analytics — FREE</strong>\n\nTotal Products: ${data.total_products}\nStock Value: R${data.total_stock_value}\nProfit Potential: R${data.total_profit_potential}\nAvg Margin: ${data.avg_margin}%\n\nLow Margin (<20%):\n${data.low_margin_products.map(p => `• ${p.name}: ${p.margin}% (R${p.cost} → R${p.price})`).join('\n') || 'None — great margins!'}\n\n${data.whatsapp_report}`;
+    el.innerHTML = `<strong>💰 Profit Analytics </strong>\n\nTotal Products: ${data.total_products}\nStock Value: R${data.total_stock_value}\nProfit Potential: R${data.total_profit_potential}\nAvg Margin: ${data.avg_margin}%\n\nLow Margin (<20%):\n${data.low_margin_products.map(p => `• ${p.name}: ${p.margin}% (R${p.cost} → R${p.price})`).join('\n') || 'None — great margins!'}\n\n${data.whatsapp_report}`;
 }
 
 document.getElementById('refreshBtn')?.addEventListener('click', () => location.reload());

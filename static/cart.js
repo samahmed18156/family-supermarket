@@ -265,7 +265,7 @@ openCart = function() {
     }, 100);
 };
 
-// Reviews: Auto-request 30s after successful checkout - FREE social proof
+// Reviews: Auto-request 30s after successful checkout social proof
 let lastOrderTime = 0;
 const originalCheckoutSuccess = () => {
     localStorage.setItem('lastOrderTime', Date.now().toString());

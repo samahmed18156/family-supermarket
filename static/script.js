@@ -268,7 +268,7 @@ console.log('💎 Luxury Polish v2.5 - Progress + Cursor + Gold accents - 1027 l
 
 // ===== CHALLENGE: ALL 4 AT ONCE - PWA + REVIEWS + PERFORMANCE + ADMIN PRO =====
 
-// 1. PWA - Service Worker Registration + Install Prompt - FREE
+// 1. PWA - Service Worker Registration + Install Prompt
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -321,7 +321,7 @@ window.addEventListener('appinstalled', () => {
   if (navigator.vibrate) navigator.vibrate(100);
 });
 
-// 2. REVIEWS - Load from API for performance - FREE social proof
+// 2. REVIEWS - Load from API for performance social proof
 async function loadReviews() {
   try {
     const res = await fetch('/api/reviews');
@@ -354,7 +354,7 @@ window.addEventListener('load', () => {
   setTimeout(loadReviews, 1000);
 });
 
-// 3. PERFORMANCE - Lazy load, WebP, prefetch - FREE 90+ PageSpeed
+// 3. PERFORMANCE - Lazy load, WebP, prefetch 90+ PageSpeed
 // Lazy load images with IntersectionObserver (better than native)
 if ('IntersectionObserver' in window) {
   const imgObserver = new IntersectionObserver((entries) => {
@@ -400,7 +400,7 @@ window.addEventListener('load', () => {
   document.body.classList.add('perf-loaded');
 });
 
-// 4. REVIEWS AUTO-REQUEST after checkout - FREE
+// 4. REVIEWS AUTO-REQUEST after checkout
 const originalCheckout = window.checkoutViaWhatsApp || null;
 // Hook into cart.js checkout if exists
 document.addEventListener('DOMContentLoaded', () => {
@@ -424,5 +424,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-console.log('🚀 CHALLENGE COMPLETE: PWA + Reviews + Performance + Admin Pro - ALL FREE - 063 837 8201');
+console.log('🚀 CHALLENGE COMPLETE: PWA + Reviews + Performance + Admin Pro - ALL  - 063 837 8201');
 console.log('📱 PWA ready, ⭐ Reviews loaded, ⚡ Performance optimized, 🛠️ Admin Pro bulk import ready');

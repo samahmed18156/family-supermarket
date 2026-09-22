@@ -1,4 +1,4 @@
-/* Family Supermarket - PWA Service Worker - FREE
+/* Family Supermarket - PWA Service Worker
    Offline cart, installable, performance boost
    v3 - Retreat supermarket SEO + 063 837 8201
 */
@@ -93,5 +93,5 @@ self.addEventListener('sync', (event) => {
 async function syncOrders() {
   // Try to send cached orders when online
   const cache = await caches.open(CACHE_NAME);
-  // Implementation for future - FREE offline orders
+  // Implementation for future offline orders
 }
