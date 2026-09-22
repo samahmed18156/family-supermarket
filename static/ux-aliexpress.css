@@ -1,0 +1,538 @@
+/* AliExpress UX Inspired - Family Supermarket Retreat - 063 837 8201 - FREE */
+/* Focus: UX patterns, not features - One-thumb, dense, bottom sheet, skeleton, sticky */
+
+/* Bottom Navigation - AliExpress style - thumb zone */
+.ali-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+    z-index: 1500;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+
+.ali-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.3rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border: none;
+    background: none;
+    min-width: 60px;
+}
+
+.ali-bottom-nav-item.active {
+    color: #ff4747;
+    background: #fff5f5;
+}
+
+.ali-bottom-nav-item .icon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.ali-bottom-nav-item.active .icon {
+    transform: scale(1.1);
+}
+
+/* Sticky Search - AliExpress top search */
+.ali-sticky-search {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.95);
+}
+
+.ali-search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f1f5f9;
+    border-radius: 9999px;
+    padding: 0.6rem 1rem;
+    transition: all 0.2s;
+}
+
+.ali-search-box:focus-within {
+    background: white;
+    box-shadow: 0 0 0 2px #ff4747, 0 4px 12px rgba(255,71,71,0.15);
+}
+
+.ali-search-box input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 0.9rem;
+}
+
+.ali-search-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.ali-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+.ali-icon-btn:hover {
+    border-color: #ff4747;
+    color: #ff4747;
+    transform: scale(1.05);
+}
+
+/* Horizontal Filter Chips - AliExpress style scrollable */
+.ali-filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.75rem 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background: white;
+    position: sticky;
+    top: 64px;
+    z-index: 999;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.ali-filter-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.ali-chip {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ali-chip.active {
+    background: #0f172a;
+    color: white;
+    border-color: #0f172a;
+}
+
+.ali-chip:hover {
+    border-color: #ff4747;
+}
+
+/* Dense Product Grid - AliExpress 2-col mobile */
+.ali-product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8fafc;
+}
+
+@media (min-width: 768px) {
+    .ali-product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .ali-product-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Product Card - AliExpress dense style */
+.ali-product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.ali-product-card:hover {
+    border-color: #ffe5e5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.ali-product-card:active {
+    transform: scale(0.98);
+}
+
+.ali-product-image-wrap {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.ali-product-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.ali-product-card:hover .ali-product-image-wrap img {
+    transform: scale(1.05);
+}
+
+.ali-product-badges {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 2;
+}
+
+.ali-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    line-height: 1.2;
+}
+
+.ali-badge-choice {
+    background: #fff3cd;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.ali-badge-super {
+    background: #ff4747;
+    color: white;
+}
+
+.ali-badge-stock {
+    background: #0f172a;
+    color: white;
+}
+
+.ali-product-quick-add {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    z-index: 2;
+}
+
+.ali-product-quick-add:hover {
+    background: #ff4747;
+    color: white;
+    transform: scale(1.1);
+}
+
+.ali-product-info {
+    padding: 0.6rem 0.6rem 0.75rem;
+}
+
+.ali-product-title {
+    font-size: 0.85rem;
+    line-height: 1.3;
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.2em;
+    color: #0f172a;
+}
+
+.ali-product-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+}
+
+.ali-price-current {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.ali-price-current.super {
+    color: #ff4747;
+}
+
+.ali-price-old {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.ali-product-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.ali-stars {
+    color: #f59e0b;
+}
+
+.ali-sold {
+    background: #f1f5f9;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+}
+
+/* Bottom Sheet - AliExpress product quick view */
+.ali-bottom-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.ali-bottom-sheet-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ali-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    z-index: 2001;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+}
+
+.ali-bottom-sheet.active {
+    transform: translateY(0);
+}
+
+.ali-bottom-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    margin: 0.75rem auto;
+}
+
+.ali-bottom-sheet-image {
+    position: relative;
+    height: 280px;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.ali-bottom-sheet-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ali-bottom-sheet-content {
+    padding: 1.25rem;
+    padding-bottom: calc(1.25rem + 80px); /* Space for sticky bar */
+}
+
+.ali-bottom-sheet-sticky-bar {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin: 0 -1.25rem -1.25rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+/* Skeleton Loaders - AliExpress progressive loading */
+.ali-skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: ali-shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes ali-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.ali-skeleton-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ali-skeleton-image {
+    aspect-ratio: 1;
+    background: #f1f5f9;
+}
+
+.ali-skeleton-text {
+    height: 12px;
+    margin: 0.5rem;
+    border-radius: 4px;
+}
+
+.ali-skeleton-text.short {
+    width: 60%;
+}
+
+/* One-thumb floating cart - AliExpress style */
+.ali-floating-cart {
+    position: fixed;
+    bottom: 80px;
+    right: 1rem;
+    width: 56px;
+    height: 56px;
+    background: #0f172a;
+    color: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 1400;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: none;
+    font-size: 1.4rem;
+}
+
+.ali-floating-cart:hover {
+    transform: scale(1.1);
+}
+
+.ali-floating-cart.has-items {
+    background: #ff4747;
+    animation: ali-bounce 0.5s;
+}
+
+@keyframes ali-bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.ali-floating-cart-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ff4747;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    border: 2px solid white;
+}
+
+/* Social proof UX - like AliExpress */
+.ali-social-proof {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.ali-viewing {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: #f0fdf4;
+    color: #059669;
+    padding: 0.15rem 0.4rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.ali-viewing-dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* Body padding for bottom nav */
+body.ali-ux {
+    padding-bottom: 80px;
+}
+
+/* Hide old product grid when AliExpress UX active */
+body.ali-ux .product-grid {
+    display: none;
+}
+
+body.ali-ux #products .search-wrap,
+body.ali-ux #products .filter-pills {
+    display: none;
+}
