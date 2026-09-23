@@ -3,23 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if user %}My Account — {{ user['name'] }}{% elif login_mode %}Login{% elif register_mode %}Create Account{% else %}Account{% endif %} — Family Supermarket Retreat</title>
+    <title>{% if user %}My Account — {{ user['name'] }}{% elif login_mode %}Login{% elif register_mode %}Create Account{% else %}My Account{% endif %} — Family Supermarket Retreat</title>
     <meta name="description" content="My account at Family Supermarket Retreat — orders, reviews, 58 5th Ave, 063 837 8201">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='modern-ux.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <style>
-        .account-wrap { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .account-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; }
-        .form-input { width: 100%; padding: 0.9rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; margin-bottom: 0.9rem; }
-        .form-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 2px rgba(5,150,105,0.15); }
-        .btn-primary { background: #0f172a; color: white; border: none; padding: 0.9rem 1.25rem; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; }
-        .btn-primary:hover { background: #1e293b; }
-        .btn-secondary { background: white; color: #0f172a; border: 1px solid #e2e8f0; padding: 0.9rem 1.25rem; border-radius: 12px; font-weight: 600; cursor: pointer; }
-        .order-item { background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap');
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        h1,h2,h3,.sg { font-family: 'Space Grotesk', sans-serif; }
+        body { background: #f6f7f9; }
+        .account-shell { max-width: 1240px; margin: 0 auto; padding: 1.25rem 1rem 6rem; }
+        /* Header profile - Shein/Temu style */
+        .pro-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%); border-radius: 20px; padding: 1.5rem; color: white; position: relative; overflow: hidden; display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+        .pro-header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(16,185,129,0.25), transparent 70%); border-radius: 50%; }
+        .avatar { width: 72px; height: 72px; border-radius: 20px; background: linear-gradient(135deg, #10b981, #059669); display: grid; place-items: center; font-weight: 800; font-size: 1.6rem; color: white; flex-shrink: 0; box-shadow: 0 8px 24px rgba(16,185,129,0.35); }
+        .pro-meta h1 { font-size: 1.6rem; line-height: 1.1; margin-bottom: 0.25rem; }
+        .pro-meta p { color: #cbd5e1; font-size: 0.9rem; }
+        .tier { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); padding: 0.25rem 0.7rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; backdrop-filter: blur(8px); }
+        /* Stats - Amazon/Shein cards */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; margin: 1rem 0 1.25rem; }
+        @media (max-width: 820px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: white; border: 1px solid #eef2f7; border-radius: 16px; padding: 1rem 1.1rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,23,42,0.06); border-color: #e2e8f0; }
+        .stat-card .label { font-size: 0.78rem; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+        .stat-card .value { font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-top: 0.15rem; }
+        .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; }
+        /* Layout - sidebar like Amazon account */
+        .pro-layout { display: grid; grid-template-columns: 260px 1fr; gap: 1.25rem; align-items: start; }
+        @media (max-width: 960px) { .pro-layout { grid-template-columns: 1fr; } }
+        .side-nav { background: white; border: 1px solid #eef2f7; border-radius: 16px; padding: 0.6rem; position: sticky; top: 84px; }
+        .side-nav a, .side-nav button { width: 100%; display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0.9rem; border-radius: 12px; border: none; background: transparent; font-size: 0.92rem; font-weight: 500; color: #334155; cursor: pointer; text-align: left; text-decoration: none; transition: all 0.18s; }
+        .side-nav a:hover, .side-nav button:hover { background: #f8fafc; color: #0f172a; }
+        .side-nav a.active, .side-nav button.active { background: #0f172a; color: white; box-shadow: 0 4px 12px rgba(15,23,42,0.15); }
+        .side-nav .sep { height: 1px; background: #f1f5f9; margin: 0.5rem 0.25rem; }
+        .content-card { background: white; border: 1px solid #eef2f7; border-radius: 16px; padding: 1.25rem; }
+        .content-card h3 { font-size: 1.15rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        /* Order tabs - Shein/Temu style */
+        .order-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1rem; scrollbar-width: none; }
+        .order-tabs::-webkit-scrollbar { display: none; }
+        .o-tab { white-space: nowrap; padding: 0.55rem 1rem; border-radius: 9999px; border: 1px solid #e2e8f0; background: white; font-size: 0.85rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.18s; }
+        .o-tab.active { background: #0f172a; color: white; border-color: #0f172a; }
+        /* Order card - pro */
+        .order-card { border: 1px solid #eef2f7; border-radius: 14px; overflow: hidden; margin-bottom: 0.9rem; background: white; transition: all 0.2s; }
+        .order-card:hover { border-color: #e2e8f0; box-shadow: 0 4px 16px rgba(15,23,42,0.04); }
+        .order-head { background: #f8fafc; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.85rem; }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+        .badge-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-completed { background: #dcfce7; color: #065f46; border: 1px solid #bbf7d0; }
+        .badge-shipped { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .order-body { padding: 0.9rem 1rem; }
+        .item-line { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px dashed #f1f5f9; }
+        .item-line:last-child { border-bottom: none; }
+        .item-thumb { width: 48px; height: 48px; border-radius: 10px; background: #f1f5f9; object-fit: cover; flex-shrink: 0; }
+        .order-foot { padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; background: white; border-top: 1px solid #f1f5f9; }
+        .btn { padding: 0.6rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: 1px solid transparent; transition: all 0.18s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-dark { background: #0f172a; color: white; }
+        .btn-dark:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-light { background: white; color: #0f172a; border-color: #e2e8f0; }
+        .btn-light:hover { background: #f8fafc; }
+        .btn-green { background: #f0fdf4; color: #065f46; border-color: #bbf7d0; }
+        /* Review composer - Shein style */
+        .review-composer { background: linear-gradient(180deg, #ffffff, #f8fafc); border: 1px solid #e2e8f0; border-radius: 14px; padding: 1rem; }
+        .stars-input { display: flex; gap: 0.25rem; font-size: 1.6rem; cursor: pointer; }
+        .stars-input span { transition: transform 0.15s; }
+        .stars-input span:hover { transform: scale(1.2); }
+        /* Auth - pro login/register like Shein */
+        .auth-wrap { min-height: 78vh; display: grid; place-items: center; padding: 2rem 1rem; }
+        .auth-card { width: 100%; max-width: 960px; background: white; border-radius: 20px; overflow: hidden; display: grid; grid-template-columns: 1.05fr 0.95fr; box-shadow: 0 20px 60px rgba(15,23,42,0.08); border: 1px solid #eef2f7; }
+        @media (max-width: 860px) { .auth-card { grid-template-columns: 1fr; } .auth-left { display: none !important; } }
+        .auth-left { background: radial-gradient(120% 120% at 0% 0%, #0f172a 0%, #1e293b 50%, #334155 100%); color: white; padding: 2.2rem; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+        .auth-left::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(16,185,129,0.22), transparent 70%); border-radius: 50%; }
+        .auth-right { padding: 2rem 1.75rem; }
+        .input { width: 100%; padding: 0.9rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; background: #fcfcfd; transition: all 0.18s; margin-bottom: 0.85rem; }
+        .input:focus { outline: none; border-color: #0f172a; background: white; box-shadow: 0 0 0 3px rgba(15,23,42,0.08); }
+        .input::placeholder { color: #94a3b8; }
+        .check-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #475569; margin-bottom: 1rem; }
+        .link { color: #0f172a; font-weight: 600; text-decoration: none; border-bottom: 1px solid #e2e8f0; }
+        .link:hover { border-color: #0f172a; }
+        .empty { text-align: center; padding: 2.5rem 1rem; color: #64748b; background: #f8fafc; border-radius: 14px; border: 1px dashed #e2e8f0; }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar" style="position: sticky; top: 0; z-index: 50;">
         <div class="nav-container">
             <a href="/" class="logo">
                 <div class="logo-icon">F</div>
@@ -27,183 +93,467 @@
             </a>
             <div class="nav-links">
                 <a href="/" class="nav-link">Shop</a>
-                <a href="/specials" class="nav-link">Specials</a>
+                <a href="/specials" class="nav-link">Specials <span class="nav-badge">{{ specials_count }}</span></a>
                 <a href="/account" class="nav-link active">Account</a>
                 <a href="/about" class="nav-link">About</a>
             </div>
         </div>
     </nav>
 
-    <div class="account-wrap">
-        {% if user %}
-        <!-- LOGGED IN - ACCOUNT DASHBOARD -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h1 style="font-family: 'Space Grotesk'; font-size: 2rem; line-height: 1;">Hi, {{ user['name'] }} 👋</h1>
-                <p style="color: #64748b;">{{ user['email'] or '' }} {% if user['email'] and user['phone'] %}•{% endif %} {{ user['phone'] or '' }} • Member since {{ user['created_at'][:10] }}</p>
+    {% if user %}
+    <!-- LOGGED IN - PRO DASHBOARD -->
+    <div class="account-shell">
+        <!-- Pro Header -->
+        <div class="pro-header">
+            <div class="avatar">{{ user['name'][:2].upper() }}</div>
+            <div class="pro-meta" style="flex:1; min-width: 200px;">
+                <h1 class="sg">Hi, {{ user['name'].split(' ')[0] }} 👋</h1>
+                <p>{{ user['email'] or user['phone'] or '' }} • Member since {{ user['created_at'][:10] if user['created_at'] else '2024' }} • 58 5th Ave Retreat</p>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <span class="tier">⭐ Gold Member</span>
+                    <span class="tier">🛡️ Verified • {{ business_phone_display }}</span>
+                    <span class="tier">📦 {{ orders|length }} orders</span>
+                </div>
             </div>
-            <a href="/logout" class="btn-secondary" style="padding: 0.6rem 1rem; text-decoration: none;">Logout</a>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="account-card" style="text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: 800;">{{ orders|length }}</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Orders</div>
-            </div>
-            <div class="account-card" style="text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: 800;">R{{ total_spent|round(2) }}</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Total Spent</div>
-            </div>
-            <div class="account-card" style="text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: 800;">{{ reviews|length }}</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Reviews</div>
+            <div style="display:flex; gap:0.6rem; align-items:center;">
+                <a href="/" class="btn btn-light" style="background: rgba(255,255,255,0.12); color: white; border-color: rgba(255,255,255,0.18); backdrop-filter: blur(8px);">🛒 Continue Shopping</a>
+                <a href="/logout" class="btn" style="background: white; color: #0f172a;">Logout</a>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
-            <div>
-                <h3 style="margin-bottom: 1rem;">📦 My Orders</h3>
-                {% if orders %}
-                    {% for order in orders %}
-                    <div class="order-item">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <strong>Order #{{ order['id'] }}</strong>
-                            <span style="background: {% if order['status']=='pending' %}#fef3c7{% else %}#f0fdf4{% endif %}; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">{{ order['status'] }}</span>
+        <!-- Stats like Shein/Amazon -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div><div class="label">Total Orders</div><div class="value">{{ orders|length }}</div><div style="font-size:0.75rem; color:#10b981; margin-top:0.2rem;">↗ Active shopper</div></div>
+                <div class="stat-icon" style="background:#f0fdf4; color:#059669;">📦</div>
+            </div>
+            <div class="stat-card">
+                <div><div class="label">Total Spent</div><div class="value">R{{ total_spent|round(2) if total_spent else '0.00' }}</div><div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Lifetime savings</div></div>
+                <div class="stat-icon" style="background:#fef3c7; color:#d97706;">💰</div>
+            </div>
+            <div class="stat-card">
+                <div><div class="label">Reviews Given</div><div class="value">{{ reviews|length }}</div><div style="font-size:0.75rem; color:#f59e0b; margin-top:0.2rem;">⭐ Genuine only</div></div>
+                <div class="stat-icon" style="background:#fef9c3; color:#ca8a04;">⭐</div>
+            </div>
+            <div class="stat-card">
+                <div><div class="label">Rewards</div><div class="value">R0</div><div style="font-size:0.75rem; color:#64748b; margin-top:0.2rem;">Coupons • Points</div></div>
+                <div class="stat-icon" style="background:#dbeafe; color:#2563eb;">🎁</div>
+            </div>
+        </div>
+
+        <div class="pro-layout">
+            <!-- Sidebar - Amazon style account nav -->
+            <aside class="side-nav">
+                <a href="#" data-tab="orders" class="active">📦 My Orders <span style="margin-left:auto; background:#f1f5f9; padding:0.15rem 0.5rem; border-radius:20px; font-size:0.75rem;">{{ orders|length }}</span></a>
+                <a href="#" data-tab="reviews">⭐ Reviews & Ratings <span style="margin-left:auto; font-size:0.75rem; color:#94a3b8;">{{ reviews|length }}</span></a>
+                <a href="#" data-tab="profile">👤 Profile & Security</a>
+                <a href="#" data-tab="addresses">📍 Addresses</a>
+                <a href="#" data-tab="wallet">💳 Wallet & Coupons</a>
+                <div class="sep"></div>
+                <a href="#" data-tab="store">🏬 Store Info • 58 5th Ave</a>
+                <a href="https://wa.me/{{ business_whatsapp }}?text=Hi%20Family%20Supermarket%20Retreat!" target="_blank">💬 WhatsApp Support</a>
+                <div class="sep"></div>
+                <a href="/logout" style="color:#ef4444;">🚪 Logout</a>
+            </aside>
+
+            <!-- Main content -->
+            <main>
+                <!-- Orders Section -->
+                <div id="tab-orders" class="tab-panel">
+                    <div class="content-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.5rem;">
+                            <h3>📦 My Orders</h3>
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="btn btn-light" onclick="window.location.href='/'">+ New Order</button>
+                                <a href="https://wa.me/{{ business_whatsapp }}" target="_blank" class="btn btn-green">💬 Track via WhatsApp</a>
+                            </div>
                         </div>
-                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.5rem;">{{ order['created_at'] }} • R{{ order['total'] }}</div>
-                        <div style="font-size: 0.85rem;">
-                            {% set items = order['items']|tojson|safe %}
-                            <span id="order-items-{{ order['id'] }}">Loading...</span>
-                            <script>
-                                try {
-                                    const items = JSON.parse('{{ order["items"]|replace("'", "\\'")|replace('"', '\\"') }}'.replace(/&quot;/g,'"'));
-                                } catch {}
-                            </script>
-                            {% for item in order['items']|tojson %}
-                            {% endfor %}
-                            <div style="font-size: 0.8rem; color: #475569; white-space: pre-wrap;">{{ order['items'] }}</div>
+
+                        <div class="order-tabs">
+                            <button class="o-tab active" data-filter="all">All Orders</button>
+                            <button class="o-tab" data-filter="pending">To Pay / Pending</button>
+                            <button class="o-tab" data-filter="shipped">To Ship</button>
+                            <button class="o-tab" data-filter="completed">Completed</button>
+                            <button class="o-tab" data-filter="review">To Review</button>
+                        </div>
+
+                        <div id="ordersList">
+                            {% if orders %}
+                                {% for order in orders %}
+                                <div class="order-card" data-status="{{ order['status']|lower }}">
+                                    <div class="order-head">
+                                        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                                            <span><strong>Order #{{ order['id'] }}</strong> • FS-{{ order['created_at'][:10] if order['created_at'] else '' }}</span>
+                                            <span style="color:#64748b;">{{ order['created_at'][:16] if order['created_at'] else '' }}</span>
+                                        </div>
+                                        <span class="badge {% if order['status']=='pending' %}badge-pending{% elif order['status']=='completed' %}badge-completed{% else %}badge-shipped{% endif %}">{{ order['status']|upper }}</span>
+                                    </div>
+                                    <div class="order-body" id="order-body-{{ order['id'] }}">
+                                        <div style="font-size:0.85rem; color:#64748b;">Loading items...</div>
+                                    </div>
+                                    <div class="order-foot">
+                                        <div><span style="font-size:0.85rem; color:#64748b;">Total:</span> <strong style="font-size:1.05rem;">R{{ order['total'] }}</strong> <span style="font-size:0.8rem; color:#64748b;">• {{ order['customer_phone'] or '' }}</span></div>
+                                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                                            <button class="btn btn-light" onclick="reorder({{ order['id'] }})">🔁 Buy Again</button>
+                                            <button class="btn btn-dark" onclick="trackOrder({{ order['id'] }})">Track Order</button>
+                                            <button class="btn btn-light" onclick="switchTab('reviews')">⭐ Review</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty">
+                                    <div style="font-size:2.2rem; margin-bottom:0.5rem;">🛒</div>
+                                    <strong>No orders yet</strong><br>
+                                    <span style="font-size:0.9rem;">Your orders will appear here. Start shopping at 58 5th Ave Retreat!</span><br>
+                                    <a href="/" class="btn btn-dark" style="margin-top:1rem;">Shop Now →</a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                    {% endfor %}
+                </div>
+
+                <!-- Reviews Section -->
+                <div id="tab-reviews" class="tab-panel" style="display:none;">
+                    <div style="display:grid; gap:1rem;">
+                        <div class="content-card review-composer">
+                            <h3>⭐ Leave a Review — Genuine only</h3>
+                            <p style="font-size:0.85rem; color:#64748b; margin-bottom:0.75rem;">Share your experience at Family Supermarket Retreat — 58 5th Ave • 063 837 8201. Genuine reviews only, no fake ratings.</p>
+                            <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+                                <div class="stars-input" id="starsInput">
+                                    <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">★</span>
+                                </div>
+                                <span id="starsLabel" style="font-size:0.85rem; font-weight:600; color:#f59e0b;">5 — Excellent</span>
+                            </div>
+                            <textarea id="reviewText" class="input" rows="3" placeholder="Write your genuine review about products, service, delivery at Retreat..."></textarea>
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+                                <span id="reviewStatus" style="font-size:0.85rem;"></span>
+                                <button onclick="submitReview()" class="btn btn-dark">Submit Review →</button>
+                            </div>
+                        </div>
+
+                        <div class="content-card">
+                            <h3>📝 My Reviews ({{ reviews|length }})</h3>
+                            <div id="myReviewsList">
+                                {% if reviews %}
+                                    {% for r in reviews %}
+                                    <div style="border-bottom:1px solid #f1f5f9; padding:0.9rem 0; display:flex; gap:0.9rem;">
+                                        <div style="width:40px; height:40px; border-radius:10px; background:#f8fafc; display:grid; place-items:center; font-weight:700; flex-shrink:0;">{{ r['rating'] }}★</div>
+                                        <div style="flex:1;">
+                                            <div style="color:#f59e0b; font-size:0.9rem;">{{ "★"*r['rating'] }}{{ "☆"*(5-r['rating']) }} <span style="color:#64748b; font-size:0.8rem;">• {{ r['created_at'][:10] if r['created_at'] else '' }} • ✓ Verified purchase</span></div>
+                                            <div style="font-size:0.92rem; margin-top:0.25rem; line-height:1.5;">{{ r['text'] }}</div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="empty"><strong>No reviews yet — be the first!</strong><br><span style="font-size:0.85rem;">Genuine reviews help Retreat families choose better.</span></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div id="tab-profile" class="tab-panel" style="display:none;">
+                    <div class="content-card">
+                        <h3>👤 Profile & Security</h3>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                            <div><label style="font-size:0.8rem; color:#64748b; font-weight:600;">FULL NAME</label><div class="input" style="background:#f8fafc;">{{ user['name'] }}</div></div>
+                            <div><label style="font-size:0.8rem; color:#64748b; font-weight:600;">MEMBER SINCE</label><div class="input" style="background:#f8fafc;">{{ user['created_at'][:10] if user['created_at'] else '' }}</div></div>
+                            <div><label style="font-size:0.8rem; color:#64748b; font-weight:600;">EMAIL</label><div class="input" style="background:#f8fafc;">{{ user['email'] or 'Not set' }}</div></div>
+                            <div><label style="font-size:0.8rem; color:#64748b; font-weight:600;">PHONE</label><div class="input" style="background:#f8fafc;">{{ user['phone'] or 'Not set' }} • 063 837 8201</div></div>
+                        </div>
+                        <div style="margin-top:1rem; padding:1rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; font-size:0.85rem; color:#065f46;">
+                            🔒 Password is securely hashed. To change password, contact support via WhatsApp {{ business_phone_display }} — we reply in 5 mins. Your data is safe at Family Supermarket Retreat.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Addresses -->
+                <div id="tab-addresses" class="tab-panel" style="display:none;">
+                    <div class="content-card">
+                        <h3>📍 Addresses</h3>
+                        <div style="display:grid; gap:0.75rem;">
+                            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:1rem; display:flex; justify-content:space-between; align-items:center;">
+                                <div><strong>Home • Default</strong><br><span style="font-size:0.85rem; color:#64748b;">Retreat, Cape Town 7965 • Near 58 5th Ave • {{ user['phone'] or '063 837 8201' }}</span></div>
+                                <span class="badge badge-completed">Default</span>
+                            </div>
+                            <div style="border:1px dashed #cbd5e1; border-radius:12px; padding:1rem; text-align:center; color:#64748b; font-size:0.9rem;">+ Add new address — delivery around Retreat, Steenberg, Lavender Hill</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wallet -->
+                <div id="tab-wallet" class="tab-panel" style="display:none;">
+                    <div class="content-card">
+                        <h3>💳 Wallet & Coupons</h3>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.9rem;">
+                            <div style="background:linear-gradient(135deg, #0f172a, #334155); color:white; border-radius:14px; padding:1.1rem;"><div style="font-size:0.8rem; opacity:0.8;">WALLET BALANCE</div><div style="font-size:1.6rem; font-weight:800; margin-top:0.25rem;">R0.00</div><div style="font-size:0.75rem; opacity:0.7; margin-top:0.5rem;">Earn on every order at 58 5th Ave</div></div>
+                            <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:14px; padding:1.1rem;"><div style="font-size:0.8rem; color:#92400e; font-weight:600;">COUPONS</div><div style="font-size:1.6rem; font-weight:800; color:#92400e;">0 available</div><div style="font-size:0.75rem; color:#b45309; margin-top:0.5rem;">Shop more to unlock wholesale deals</div></div>
+                            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px; padding:1.1rem;"><div style="font-size:0.8rem; color:#065f46; font-weight:600;">POINTS</div><div style="font-size:1.6rem; font-weight:800; color:#065f46;">{{ orders|length * 10 }}</div><div style="font-size:0.75rem; color:#047857; margin-top:0.5rem;">10 points per order • Gold member</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Store -->
+                <div id="tab-store" class="tab-panel" style="display:none;">
+                    <div class="content-card">
+                        <h3>🏬 Family Supermarket Retreat — Store Info</h3>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                            <div>
+                                <div style="font-size:0.9rem; line-height:1.6;">
+                                    <strong>58 5th Ave, Retreat, Cape Town 7965</strong><br>
+                                    📞 {{ business_phone_display }}<br>
+                                    WhatsApp: +{{ business_whatsapp }}<br>
+                                    🕒 Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm<br><br>
+                                    <span style="color:#059669; font-weight:600;">● {{ store_status.message if store_status else 'Open now' }}</span><br>
+                                    Family owned since 2018 • 500+ products • Wholesale prices cheaper than Shoprite Retreat
+                                </div>
+                                <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                                    <a href="https://wa.me/{{ business_whatsapp }}" target="_blank" class="btn btn-green">💬 WhatsApp {{ business_phone_display }}</a>
+                                    <a href="tel:+{{ business_whatsapp }}" class="btn btn-light">📞 Call Store</a>
+                                </div>
+                            </div>
+                            <div style="background:#f8fafc; border-radius:12px; padding:1rem; font-size:0.85rem;">
+                                <strong>Why shop with us?</strong>
+                                <ul style="margin:0.5rem 0 0 1.1rem; line-height:1.7; color:#475569;">
+                                    <li>Fresh produce daily from local farms</li>
+                                    <li>Wholesale prices for everyone in Retreat</li>
+                                    <li>Delivery around Retreat, Steenberg, Lavender Hill</li>
+                                    <li>Reply in 5 mins on WhatsApp</li>
+                                    <li>Genuine reviews only — no fake ratings</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Tabs like Amazon/Shein account
+        const navLinks = document.querySelectorAll('.side-nav a[data-tab]');
+        const panels = document.querySelectorAll('.tab-panel');
+        function switchTab(name) {
+            panels.forEach(p => p.style.display = 'none');
+            const target = document.getElementById('tab-'+name);
+            if (target) target.style.display = 'block';
+            navLinks.forEach(a => a.classList.remove('active'));
+            const active = document.querySelector(`.side-nav a[data-tab="${name}"]`);
+            if (active) active.classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        navLinks.forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const tab = a.dataset.tab;
+                if (tab) switchTab(tab);
+            });
+        });
+        window.switchTab = switchTab;
+
+        // Order tabs filter (All, Pending etc) - Shein style
+        document.querySelectorAll('.o-tab').forEach(t => {
+            t.addEventListener('click', () => {
+                document.querySelectorAll('.o-tab').forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                const filter = t.dataset.filter;
+                document.querySelectorAll('.order-card').forEach(card => {
+                    const status = card.dataset.status || '';
+                    if (filter === 'all') card.style.display = 'block';
+                    else if (filter === 'pending' && status.includes('pending')) card.style.display = 'block';
+                    else if (filter === 'shipped' && (status.includes('ship') || status.includes('pending'))) card.style.display = 'block';
+                    else if (filter === 'completed' && status.includes('complet')) card.style.display = 'block';
+                    else if (filter === 'review') card.style.display = 'block'; // all need review initially
+                    else card.style.display = 'none';
+                });
+            });
+        });
+
+        // Parse order items JSON and render like Amazon/Shein
+        const ordersData = {{ orders|tojson|safe if orders else '[]' }};
+        ordersData.forEach(o => {
+            try {
+                const el = document.getElementById('order-body-'+o.id);
+                if (!el) return;
+                let items = [];
+                try { items = JSON.parse(o.items); } catch { items = []; }
+                if (!Array.isArray(items) || items.length===0) {
+                    el.innerHTML = `<div style="font-size:0.85rem; color:#64748b; white-space:pre-wrap; max-height:120px; overflow:auto;">${o.items}</div>`;
+                    return;
+                }
+                el.innerHTML = items.map(it => `
+                    <div class="item-line">
+                        <img class="item-thumb" src="/static/images/${(it.image||'rice.jpg')}" onerror="this.src='/static/images/rice.jpg'">
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">${it.name||'Product'}</div>
+                            <div style="font-size:0.8rem; color:#64748b;">Qty ${it.qty||1} • R${(it.price||0).toFixed(2)} each • ${it.category||'Groceries'}</div>
+                        </div>
+                        <div style="font-weight:700; font-size:0.9rem;">R${((it.price||0)*(it.qty||1)).toFixed(2)}</div>
+                    </div>
+                `).join('');
+            } catch(e) {}
+        });
+
+        function reorder(id) {
+            // Add all items from order to cart (localStorage)
+            const order = ordersData.find(o => o.id === id);
+            if (!order) return;
+            try {
+                const items = JSON.parse(order.items);
+                let cart = JSON.parse(localStorage.getItem('fs_cart')||'[]');
+                items.forEach(it => {
+                    const existing = cart.find(c => c.id === it.id);
+                    if (existing) existing.qty += it.qty||1;
+                    else cart.push({id: it.id, name: it.name, price: it.price, image: it.image||'rice.jpg', qty: it.qty||1});
+                });
+                localStorage.setItem('fs_cart', JSON.stringify(cart));
+                alert('Added '+items.length+' items to cart! Go to homepage to checkout via WhatsApp {{ business_phone_display }}');
+                window.location.href = '/';
+            } catch(e) { alert('Could not reorder — WhatsApp {{ business_phone_display }}'); }
+        }
+        function trackOrder(id) {
+            const text = `Hi Family Supermarket Retreat! Track order #${id} — 58 5th Ave • {{ business_phone_display }}`;
+            window.open(`https://wa.me/{{ business_whatsapp }}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Stars input like Shein
+        let currentRating = 5;
+        const starsEl = document.getElementById('starsInput');
+        const labelEl = document.getElementById('starsLabel');
+        const labels = {1:'1 — Bad',2:'2 — Poor',3:'3 — Average',4:'4 — Good',5:'5 — Excellent'};
+        if (starsEl) {
+            starsEl.querySelectorAll('span').forEach(s => {
+                s.addEventListener('click', () => {
+                    currentRating = parseInt(s.dataset.v);
+                    updateStars();
+                });
+                s.addEventListener('mouseenter', () => {
+                    const v = parseInt(s.dataset.v);
+                    starsEl.querySelectorAll('span').forEach((sp, idx) => {
+                        sp.textContent = idx < v ? '★' : '☆';
+                        sp.style.color = idx < v ? '#f59e0b' : '#cbd5e1';
+                    });
+                });
+            });
+            starsEl.addEventListener('mouseleave', updateStars);
+            function updateStars() {
+                starsEl.querySelectorAll('span').forEach((sp, idx) => {
+                    sp.textContent = idx < currentRating ? '★' : '☆';
+                    sp.style.color = idx < currentRating ? '#f59e0b' : '#cbd5e1';
+                });
+                if (labelEl) labelEl.textContent = labels[currentRating];
+            }
+            updateStars();
+        }
+
+        async function submitReview() {
+            const text = document.getElementById('reviewText').value.trim();
+            const status = document.getElementById('reviewStatus');
+            if (!text) { status.textContent = 'Write your review'; status.style.color = '#ef4444'; return; }
+            status.textContent = 'Submitting...'; status.style.color = '#64748b';
+            try {
+                const res = await fetch('/api/user/review', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({rating: currentRating, text})});
+                const data = await res.json();
+                if (data.success) {
+                    status.textContent = '✓ Review submitted! Thank you — genuine review helps Retreat families.';
+                    status.style.color = '#059669';
+                    document.getElementById('reviewText').value = '';
+                    setTimeout(()=>window.location.reload(), 900);
+                } else { status.textContent = data.error; status.style.color = '#ef4444'; }
+            } catch(e) { status.textContent = 'Error: '+e.message; status.style.color = '#ef4444'; }
+        }
+    </script>
+
+    {% else %}
+    <!-- NOT LOGGED IN - PRO AUTH LIKE SHEIN/TEMU -->
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="auth-left">
+                <div>
+                    <div style="display:flex; align-items:center; gap:0.7rem; margin-bottom:1.5rem;">
+                        <div style="width:44px; height:44px; background:linear-gradient(135deg, #10b981, #059669); border-radius:12px; display:grid; place-items:center; font-weight:800;">F</div>
+                        <div><div style="font-weight:700;">Family Supermarket</div><div style="font-size:0.8rem; opacity:0.8;">Retreat • 58 5th Ave</div></div>
+                    </div>
+                    <h2 class="sg" style="font-size:2rem; line-height:0.95; margin-bottom:1rem;">Join Retreat's<br>favorite store<br>since 2018.</h2>
+                    <p style="color:#cbd5e1; font-size:0.92rem; line-height:1.5;">500+ products, wholesale prices cheaper than Shoprite Retreat, delivery in 5 mins via WhatsApp.</p>
+                </div>
+                <div style="margin-top:2rem;">
+                    <div style="display:grid; gap:0.7rem;">
+                        <div style="display:flex; gap:0.7rem; align-items:center; font-size:0.85rem;"><span style="width:28px; height:28px; background:rgba(255,255,255,0.12); border-radius:8px; display:grid; place-items:center;">📦</span> Track orders, reorder in 1 tap</div>
+                        <div style="display:flex; gap:0.7rem; align-items:center; font-size:0.85rem;"><span style="width:28px; height:28px; background:rgba(255,255,255,0.12); border-radius:8px; display:grid; place-items:center;">⭐</span> Genuine reviews, no fake ratings</div>
+                        <div style="display:flex; gap:0.7rem; align-items:center; font-size:0.85rem;"><span style="width:28px; height:28px; background:rgba(255,255,255,0.12); border-radius:8px; display:grid; place-items:center;">💬</span> WhatsApp support {{ business_phone_display }}</div>
+                    </div>
+                    <div style="margin-top:1.5rem; padding:0.9rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:12px; font-size:0.8rem;">
+                        <strong>🏬 Store:</strong> 58 5th Ave, Retreat, Cape Town 7965<br>
+                        <strong>🕒 Hours:</strong> Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm<br>
+                        <strong>📞 Phone:</strong> {{ business_phone_display }} • +{{ business_whatsapp }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-right">
+                {% if login_mode %}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                    <h2 class="sg" style="font-size:1.5rem;">Welcome back</h2>
+                    <a href="/register" class="btn btn-light" style="font-size:0.8rem;">Create account</a>
+                </div>
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.25rem;">Login to see orders, reviews, wallet — Family Supermarket Retreat</p>
+                <input type="text" id="loginIdentifier" class="input" placeholder="Email or Phone (e.g. 063 837 8201)">
+                <div style="position:relative;">
+                    <input type="password" id="loginPassword" class="input" placeholder="Password (min 6 characters)">
+                </div>
+                <button onclick="doLogin()" class="btn btn-dark" style="width:100%; justify-content:center; padding:0.9rem; margin-bottom:0.75rem; border-radius:12px;">Login →</button>
+                <div id="loginStatus" style="font-size:0.85rem; text-align:center; margin-bottom:0.75rem; min-height:1.2em;"></div>
+                <div style="text-align:center; font-size:0.85rem; color:#64748b;">
+                    No account? <a href="/register" class="link">Create one</a> • <a href="/" class="link">Continue as guest</a>
+                </div>
+
+                {% elif register_mode %}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                    <h2 class="sg" style="font-size:1.5rem;">Create account</h2>
+                    <a href="/login" class="btn btn-light" style="font-size:0.8rem;">Login</a>
+                </div>
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.25rem;">Join 500+ Retreat families — track orders, earn points, genuine reviews</p>
+                <input type="text" id="regName" class="input" placeholder="Full Name *">
+                <input type="email" id="regEmail" class="input" placeholder="Email (optional if phone provided)">
+                <input type="tel" id="regPhone" class="input" placeholder="Phone e.g. 063 837 8201 (optional if email)">
+                <input type="password" id="regPassword" class="input" placeholder="Password (min 6 characters) *">
+                <div class="check-row"><input type="checkbox" checked> I agree to receive order updates via WhatsApp {{ business_phone_display }}</div>
+                <button onclick="doRegister()" class="btn btn-dark" style="width:100%; justify-content:center; padding:0.9rem; margin-bottom:0.75rem; border-radius:12px;">Create Account →</button>
+                <div id="regStatus" style="font-size:0.85rem; text-align:center; margin-bottom:0.75rem; min-height:1.2em;"></div>
+                <div style="text-align:center; font-size:0.85rem; color:#64748b;">
+                    Already have account? <a href="/login" class="link">Login</a> • <a href="/" class="link">Shop as guest</a>
+                </div>
+
                 {% else %}
-                    <div class="account-card" style="text-align: center; color: #64748b;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛒</div>
-                        No orders yet<br>
-                        <a href="/" style="color: #059669; font-weight: 600;">Start shopping →</a>
-                    </div>
+                <!-- Default account landing - pro like Amazon Your Account -->
+                <h2 class="sg" style="font-size:1.6rem; margin-bottom:0.5rem;">My Account</h2>
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.5rem;">Login or create account — 58 5th Ave Retreat • {{ business_phone_display }}</p>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.9rem; margin-bottom:1.25rem;">
+                    <a href="/login" style="text-decoration:none;">
+                        <div style="border:1px solid #e2e8f0; border-radius:14px; padding:1.1rem; transition:all 0.18s;" onmouseover="this.style.borderColor='#0f172a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
+                            <div style="width:40px; height:40px; background:#0f172a; color:white; border-radius:10px; display:grid; place-items:center; margin-bottom:0.6rem;">🔑</div>
+                            <strong style="color:#0f172a;">Login</strong><br><span style="font-size:0.8rem; color:#64748b;">Email or phone + password</span>
+                        </div>
+                    </a>
+                    <a href="/register" style="text-decoration:none;">
+                        <div style="border:1px solid #e2e8f0; border-radius:14px; padding:1.1rem; transition:all 0.18s;" onmouseover="this.style.borderColor='#0f172a'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
+                            <div style="width:40px; height:40px; background:#f0fdf4; color:#059669; border:1px solid #bbf7d0; border-radius:10px; display:grid; place-items:center; margin-bottom:0.6rem;">👤</div>
+                            <strong style="color:#0f172a;">Create Account</strong><br><span style="font-size:0.8rem; color:#64748b;">Email or phone + password</span>
+                        </div>
+                    </a>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; margin-bottom:1.25rem;">
+                    <div style="background:#f8fafc; border-radius:10px; padding:0.7rem; text-align:center;"><div style="font-size:1.2rem;">📦</div><div style="font-size:0.75rem; font-weight:600; margin-top:0.2rem;">Orders</div></div>
+                    <div style="background:#f8fafc; border-radius:10px; padding:0.7rem; text-align:center;"><div style="font-size:1.2rem;">⭐</div><div style="font-size:0.75rem; font-weight:600; margin-top:0.2rem;">Reviews</div></div>
+                    <div style="background:#f8fafc; border-radius:10px; padding:0.7rem; text-align:center;"><div style="font-size:1.2rem;">🎁</div><div style="font-size:0.75rem; font-weight:600; margin-top:0.2rem;">Rewards</div></div>
+                </div>
+                <a href="/" class="btn btn-light" style="width:100%; justify-content:center;">← Continue Shopping at 58 5th Ave</a>
                 {% endif %}
             </div>
-
-            <div>
-                <h3 style="margin-bottom: 1rem;">⭐ My Reviews</h3>
-                <div class="account-card">
-                    <h4 style="margin-bottom: 0.75rem;">Leave a review</h4>
-                    <select id="reviewRating" class="form-input" style="margin-bottom: 0.5rem;">
-                        <option value="5">★★★★★ 5 - Excellent</option>
-                        <option value="4">★★★★ 4 - Good</option>
-                        <option value="3">★★★ 3 - Average</option>
-                        <option value="2">★★ 2 - Poor</option>
-                        <option value="1">★ 1 - Bad</option>
-                    </select>
-                    <textarea id="reviewText" class="form-input" rows="3" placeholder="Your review about Family Supermarket Retreat..."></textarea>
-                    <button onclick="submitReview()" class="btn-primary">Submit Review</button>
-                    <div id="reviewStatus" style="font-size: 0.85rem; margin-top: 0.5rem;"></div>
-                </div>
-
-                {% if reviews %}
-                    {% for r in reviews %}
-                    <div class="order-item">
-                        <div style="color: #f59e0b;">{{ "★"*r['rating'] }}{{ "☆"*(5-r['rating']) }}</div>
-                        <div style="font-size: 0.9rem; margin: 0.4rem 0;">{{ r['text'] }}</div>
-                        <div style="font-size: 0.75rem; color: #64748b;">{{ r['created_at'][:10] }} • Verified</div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div style="font-size: 0.85rem; color: #64748b; text-align: center; padding: 1rem;">No reviews yet — be the first!</div>
-                {% endif %}
-
-                <div class="account-card" style="margin-top: 1.25rem;">
-                    <h4 style="margin-bottom: 0.5rem;">📍 Store Info</h4>
-                    <div style="font-size: 0.9rem; line-height: 1.5;">
-                        58 5th Ave, Retreat, Cape Town 7965<br>
-                        📞 063 837 8201<br>
-                        WhatsApp: 27638378201<br>
-                        Mon-Fri 8am-6pm, Sat 8am-5pm, Sun 9am-2pm
-                    </div>
-                </div>
-            </div>
         </div>
-
-        {% elif login_mode %}
-        <!-- LOGIN -->
-        <div style="max-width: 420px; margin: 3rem auto;">
-            <div class="account-card">
-                <h1 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem;">Welcome back</h1>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Login to see your orders, reviews, and account — 58 5th Ave Retreat</p>
-                
-                <input type="text" id="loginIdentifier" class="form-input" placeholder="Email or Phone (e.g. 063 837 8201)">
-                <input type="password" id="loginPassword" class="form-input" placeholder="Password (min 6 characters)">
-                
-                <button onclick="doLogin()" class="btn-primary" style="margin-bottom: 1rem;">Login</button>
-                <div id="loginStatus" style="font-size: 0.85rem; text-align: center; margin-bottom: 1rem;"></div>
-                
-                <div style="text-align: center; font-size: 0.9rem;">
-                    No account? <a href="/register" style="color: #059669; font-weight: 600;">Create account</a><br>
-                    <a href="/" style="color: #64748b;">← Back to shop</a>
-                </div>
-            </div>
-        </div>
-
-        {% elif register_mode %}
-        <!-- REGISTER -->
-        <div style="max-width: 420px; margin: 3rem auto;">
-            <div class="account-card">
-                <h1 style="font-family: 'Space Grotesk'; font-size: 1.6rem; margin-bottom: 0.5rem;">Create account</h1>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Join Family Supermarket Retreat — track orders, reviews — 58 5th Ave</p>
-                
-                <input type="text" id="regName" class="form-input" placeholder="Full Name">
-                <input type="email" id="regEmail" class="form-input" placeholder="Email (optional if phone provided)">
-                <input type="tel" id="regPhone" class="form-input" placeholder="Phone e.g. 063 837 8201 (optional if email provided)">
-                <input type="password" id="regPassword" class="form-input" placeholder="Password (min 6 characters)">
-                
-                <button onclick="doRegister()" class="btn-primary" style="margin-bottom: 1rem;">Create Account</button>
-                <div id="regStatus" style="font-size: 0.85rem; text-align: center; margin-bottom: 1rem;"></div>
-                
-                <div style="text-align: center; font-size: 0.9rem;">
-                    Already have account? <a href="/login" style="color: #059669; font-weight: 600;">Login</a><br>
-                    <a href="/" style="color: #64748b;">← Back to shop</a>
-                </div>
-            </div>
-        </div>
-
-        {% else %}
-        <!-- NOT LOGGED IN - SHOW LOGIN/REGISTER OPTIONS -->
-        <div style="max-width: 600px; margin: 3rem auto; text-align: center;">
-            <h1 style="font-family: 'Space Grotesk'; font-size: 2rem; margin-bottom: 1rem;">My Account</h1>
-            <p style="color: #64748b; margin-bottom: 2rem;">Login or create account to see your orders, reviews, and more — 58 5th Ave Retreat • 063 837 8201</p>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <a href="/login" style="text-decoration: none;">
-                    <div class="account-card" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔑</div>
-                        <strong>Login</strong><br>
-                        <span style="font-size: 0.85rem; color: #64748b;">Email or phone + password</span>
-                    </div>
-                </a>
-                <a href="/register" style="text-decoration: none;">
-                    <div class="account-card" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
-                        <strong>Create Account</strong><br>
-                        <span style="font-size: 0.85rem; color: #64748b;">Email or phone + password</span>
-                    </div>
-                </a>
-            </div>
-            
-            <div style="margin-top: 2rem;">
-                <a href="/" class="btn-secondary" style="text-decoration: none; display: inline-block;">← Continue Shopping</a>
-            </div>
-        </div>
-        {% endif %}
     </div>
 
     <script>
@@ -211,115 +561,34 @@
             const identifier = document.getElementById('loginIdentifier').value.trim();
             const password = document.getElementById('loginPassword').value;
             const status = document.getElementById('loginStatus');
-            
-            if (!identifier || !password) {
-                status.textContent = 'Enter email/phone and password';
-                status.style.color = '#ef4444';
-                return;
-            }
-            
-            status.textContent = 'Logging in...';
-            status.style.color = '#64748b';
-            
+            if (!identifier || !password) { status.textContent = 'Enter email/phone and password'; status.style.color = '#ef4444'; return; }
+            status.textContent = 'Logging in...'; status.style.color = '#64748b';
             try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({identifier, password})
-                });
+                const res = await fetch('/api/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({identifier, password})});
                 const data = await res.json();
-                if (data.success) {
-                    status.textContent = 'Success! Redirecting...';
-                    status.style.color = '#059669';
-                    setTimeout(() => window.location.href = '/account', 500);
-                } else {
-                    status.textContent = data.error || 'Login failed';
-                    status.style.color = '#ef4444';
-                }
-            } catch (e) {
-                status.textContent = 'Error: ' + e.message;
-                status.style.color = '#ef4444';
-            }
+                if (data.success) { status.textContent = '✓ Success! Redirecting...'; status.style.color = '#059669'; setTimeout(()=>window.location.href='/account', 500); }
+                else { status.textContent = data.error || 'Login failed'; status.style.color = '#ef4444'; }
+            } catch(e) { status.textContent = 'Error: '+e.message; status.style.color = '#ef4444'; }
         }
-
         async function doRegister() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
             const status = document.getElementById('regStatus');
-            
-            if (!name || !password) {
-                status.textContent = 'Name and password required';
-                status.style.color = '#ef4444';
-                return;
-            }
-            if (!email && !phone) {
-                status.textContent = 'Email or phone required';
-                status.style.color = '#ef4444';
-                return;
-            }
-            
-            status.textContent = 'Creating account...';
-            status.style.color = '#64748b';
-            
+            if (!name || !password) { status.textContent = 'Name and password required'; status.style.color = '#ef4444'; return; }
+            if (!email && !phone) { status.textContent = 'Email or phone required'; status.style.color = '#ef4444'; return; }
+            status.textContent = 'Creating account...'; status.style.color = '#64748b';
             try {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name, email, phone, password})
-                });
+                const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, phone, password})});
                 const data = await res.json();
-                if (data.success) {
-                    status.textContent = data.message + ' Redirecting...';
-                    status.style.color = '#059669';
-                    setTimeout(() => window.location.href = '/account', 800);
-                } else {
-                    status.textContent = data.error || 'Registration failed';
-                    status.style.color = '#ef4444';
-                }
-            } catch (e) {
-                status.textContent = 'Error: ' + e.message;
-                status.style.color = '#ef4444';
-            }
+                if (data.success) { status.textContent = '✓ '+data.message+' Redirecting...'; status.style.color = '#059669'; setTimeout(()=>window.location.href='/account', 800); }
+                else { status.textContent = data.error || 'Registration failed'; status.style.color = '#ef4444'; }
+            } catch(e) { status.textContent = 'Error: '+e.message; status.style.color = '#ef4444'; }
         }
-
-        async function submitReview() {
-            const rating = document.getElementById('reviewRating').value;
-            const text = document.getElementById('reviewText').value.trim();
-            const status = document.getElementById('reviewStatus');
-            
-            if (!text) {
-                status.textContent = 'Write your review';
-                status.style.color = '#ef4444';
-                return;
-            }
-            
-            try {
-                const res = await fetch('/api/user/review', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({rating: parseInt(rating), text})
-                });
-                const data = await res.json();
-                if (data.success) {
-                    status.textContent = 'Review submitted! Thank you.';
-                    status.style.color = '#059669';
-                    document.getElementById('reviewText').value = '';
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    status.textContent = data.error;
-                    status.style.color = '#ef4444';
-                }
-            } catch (e) {
-                status.textContent = 'Error: ' + e.message;
-                status.style.color = '#ef4444';
-            }
-        }
-
-        // Allow Enter key
         document.getElementById('loginPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
         document.getElementById('regPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') doRegister(); });
     </script>
+    {% endif %}
 </body>
 </html>
